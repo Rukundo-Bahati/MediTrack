@@ -2,7 +2,7 @@
 
 Since you're on Kali Linux with an externally managed Python environment, here are the easiest ways to generate QR codes:
 
-## 🚀 Method 1: Quick Install with apt (Recommended)
+## Method 1: Quick Install with apt (Recommended)
 
 ```bash
 # Install qrcode library system-wide using apt

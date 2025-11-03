@@ -18,13 +18,13 @@ def create_virtual_environment():
         print(f"Virtual environment already exists at {venv_path}")
         return venv_path
     
-    print("🔧 Creating virtual environment...")
+    print("Creating virtual environment...")
     try:
         venv.create(venv_path, with_pip=True)
-        print(f"✅ Virtual environment created at {venv_path}")
+        print(f"Virtual environment created at {venv_path}")
         return venv_path
     except Exception as e:
-        print(f"❌ Failed to create virtual environment: {e}")
+        print(f"Failed to create virtual environment: {e}")
         return None
 
 def get_venv_python(venv_path):
@@ -43,19 +43,19 @@ def get_venv_pip(venv_path):
 
 def install_dependencies():
     """Install required Python packages in virtual environment."""
-    print("📦 Installing Python dependencies...")
+    print("Installing Python dependencies...")
     
     # Try system-wide installation first (for systems that allow it)
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], 
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print("✅ Dependencies installed system-wide!")
+        print("Dependencies installed system-wide!")
         return True, sys.executable
     except subprocess.CalledProcessError:
         pass
     
     # If system-wide fails, use virtual environment
-    print("🔧 System-wide installation not allowed, using virtual environment...")
+    print("System-wide installation not allowed, using virtual environment...")
     
     venv_path = create_virtual_environment()
     if not venv_path:
@@ -73,20 +73,20 @@ def install_dependencies():
         # Install requirements
         print("   Installing qrcode library...")
         subprocess.check_call([venv_pip, "install", "-r", "requirements.txt"])
-        print("✅ Dependencies installed in virtual environment!")
+        print("Dependencies installed in virtual environment!")
         return True, venv_python
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to install dependencies: {e}")
+        print(f"Failed to install dependencies: {e}")
         return False, None
 
 def run_qr_generator(python_executable):
     """Run the QR code generator."""
-    print("\n🏥 Running MediTrack QR Code Generator...")
+    print("\nRunning MediTrack QR Code Generator...")
     try:
         subprocess.check_call([python_executable, "generate_qr.py"])
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to generate QR codes: {e}")
+        print(f"Failed to generate QR codes: {e}")
         return False
 
 def main():
@@ -95,18 +95,18 @@ def main():
     
     # Check if requirements.txt exists
     if not os.path.exists("requirements.txt"):
-        print("❌ requirements.txt not found!")
+        print("requirements.txt not found!")
         return
     
     # Check if generate_qr.py exists
     if not os.path.exists("generate_qr.py"):
-        print("❌ generate_qr.py not found!")
+        print("generate_qr.py not found!")
         return
     
     # Install dependencies
     success, python_executable = install_dependencies()
     if not success:
-        print("\n❌ Failed to install dependencies. Please try manual installation:")
+        print("\nFailed to install dependencies. Please try manual installation:")
         print("   python3 -m venv qr_venv")
         print("   source qr_venv/bin/activate  # On Windows: qr_venv\\Scripts\\activate")
         print("   pip install -r requirements.txt")
@@ -117,13 +117,13 @@ def main():
     if not run_qr_generator(python_executable):
         return
     
-    print("\n🎉 Setup complete!")
-    print("📁 Check the 'qr_codes' directory for generated QR codes")
-    print("📱 Use these QR codes to test the MediTrack app")
+    print("\nSetup complete!")
+    print("Check the 'qr_codes' directory for generated QR codes")
+    print("Use these QR codes to test the MediTrack app")
     
     # Show virtual environment info if used
     if python_executable != sys.executable:
-        print(f"\n💡 Virtual environment created at: qr_venv/")
+        print(f"\nVirtual environment created at: qr_venv/")
         print("   To run the generator again:")
         if os.name == 'nt':
             print("   qr_venv\\Scripts\\python generate_qr.py")
@@ -134,9 +134,9 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n❌ Setup cancelled by user")
+        print("\nSetup cancelled by user")
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\nError: {e}")
         print("\nTry manual installation:")
         print("python3 -m venv qr_venv")
         print("source qr_venv/bin/activate")

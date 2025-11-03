@@ -1,5 +1,5 @@
 @echo off
-echo 🏥 MediTrack QR Code Generator
+echo MediTrack QR Code Generator
 echo ================================
 echo.
 

@@ -66,19 +66,19 @@ MOCK_BATCHES = [
 
 def install_qrcode():
     """Provide instructions to install qrcode library."""
-    print("❌ QR code library not found!")
+    print("QR code library not found!")
     print("\nTo install the required library, run ONE of these commands:")
-    print("\n🔧 Option 1: Using virtual environment (recommended for Kali/Ubuntu):")
+    print("\nOption 1: Using virtual environment (recommended for Kali/Ubuntu):")
     print("   python3 -m venv qr_venv")
     print("   source qr_venv/bin/activate")
     print("   pip install qrcode[pil]")
     print("   python quick_generate.py")
-    print("\n🔧 Option 2: System-wide (if allowed):")
+    print("\nOption 2: System-wide (if allowed):")
     print("   pip install qrcode[pil]")
-    print("\n🔧 Option 3: Using apt (Debian/Ubuntu/Kali):")
+    print("\nOption 3: Using apt (Debian/Ubuntu/Kali):")
     print("   sudo apt update")
     print("   sudo apt install python3-qrcode")
-    print("\n🔧 Option 4: Force install (not recommended):")
+    print("\nOption 4: Force install (not recommended):")
     print("   pip install qrcode[pil] --break-system-packages")
 
 def create_qr_code(batch_data, output_dir="qr_codes"):
@@ -135,7 +135,7 @@ def generate_batch_info_file(output_dir="qr_codes"):
     return info_file
 
 def main():
-    print("🏥 MediTrack Quick QR Code Generator")
+    print("MediTrack Quick QR Code Generator")
     print("=" * 40)
     
     if not HAS_QRCODE:
@@ -153,29 +153,29 @@ def main():
         if filepath:
             generated_files.append(filepath)
             
-            status_icon = "✅" if batch_data["authentic"] else "❌"
+            status_icon = "[AUTHENTIC]" if batch_data["authentic"] else "[COUNTERFEIT]"
             status_text = "Authentic" if batch_data["authentic"] else "Counterfeit"
             
             print(f"{i}. {batch_data['batchId']}")
-            print(f"   📦 {batch_data['drugName']}")
-            print(f"   🏭 {batch_data['manufacturer']}")
-            print(f"   {status_icon} {status_text}")
-            print(f"   📄 {os.path.basename(filepath)}")
+            print(f"   Drug: {batch_data['drugName']}")
+            print(f"   Manufacturer: {batch_data['manufacturer']}")
+            print(f"   Status: {status_icon} {status_text}")
+            print(f"   File: {os.path.basename(filepath)}")
             print(f"   🔗 QR Content: {qr_content}")
             print()
     
     # Generate batch info file
     info_file = generate_batch_info_file(output_dir)
     
-    print("📋 Additional files generated:")
+    print("Additional files generated:")
     print(f"   - {os.path.basename(info_file)} (batch information)")
     
     print()
-    print("🎉 QR code generation complete!")
-    print(f"📁 Output directory: {os.path.abspath(output_dir)}")
-    print(f"📱 Scan these QR codes with the MediTrack app to test verification")
+    print("QR code generation complete!")
+    print(f"Output directory: {os.path.abspath(output_dir)}")
+    print(f"Scan these QR codes with the MediTrack app to test verification")
     print()
-    print("💡 QR Code Format:")
+    print("QR Code Format:")
     print("   Each QR code contains: batch:BATCH-ID")
     print("   Your mockApi.ts will process these and return verification data")
 
@@ -183,9 +183,9 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n❌ Generation cancelled by user")
+        print("\nGeneration cancelled by user")
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\nError: {e}")
         if not HAS_QRCODE:
             print("Make sure you have the 'qrcode' package installed")
         else:
