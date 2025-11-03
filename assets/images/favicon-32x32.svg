@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" fill="#fc7f03" rx="4"/>
+  
+  <!-- Shield Shape -->
+  <path d="M6 4 L26 4 L26 8 L22 28 L10 28 L6 8 Z" fill="white"/>
+  
+  <!-- Medical Cross -->
+  <rect x="14" y="10" width="4" height="2" fill="#fc7f03"/>
+  <rect x="15" y="9" width="2" height="4" fill="#fc7f03"/>
+  
+  <!-- Blockchain pattern -->
+  <circle cx="11" cy="16" r="1.5" fill="#fc7f03"/>
+  <circle cx="16" cy="16" r="1.5" fill="#fc7f03"/>
+  <circle cx="21" cy="16" r="1.5" fill="#fc7f03"/>
+  <line x1="12.5" y1="16" x2="14.5" y2="16" stroke="#fc7f03" stroke-width="1"/>
+  <line x1="17.5" y1="16" x2="19.5" y2="16" stroke="#fc7f03" stroke-width="1"/>
+  
+  <!-- QR pattern -->
+  <rect x="12" y="20" width="2" height="2" fill="#fc7f03"/>
+  <rect x="16" y="20" width="2" height="2" fill="#fc7f03"/>
+  <rect x="20" y="20" width="2" height="2" fill="#fc7f03"/>
+</svg>

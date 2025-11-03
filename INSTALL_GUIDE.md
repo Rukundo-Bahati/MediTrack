@@ -13,7 +13,7 @@ sudo apt install python3-qrcode
 python3 quick_generate.py
 ```
 
-## 🔧 Method 2: Virtual Environment (Clean approach)
+## Method 2: Virtual Environment (Clean approach)
 
 ```bash
 # Create virtual environment
@@ -42,14 +42,14 @@ pip install qrcode[pil] --break-system-packages
 python3 generate_qr.py
 ```
 
-## 🎯 Method 4: Use the automated script
+## Method 4: Use the automated script
 
 ```bash
 # The updated script handles virtual environments automatically
 ./generate_qr.sh
 ```
 
-## 📱 What You'll Get
+## What You'll Get
 
 After running any method, you'll have:
 
@@ -63,13 +63,13 @@ qr_codes/
 └── batch_info.json                   # Batch details
 ```
 
-## 🔍 Testing
+## Testing
 
 1. Open MediTrack app on your phone
 2. Scan any QR code from the `qr_codes/` directory
 3. App will show verification results based on the batch ID
-4. Authentic batches show ✅ with full provenance
-5. Fake batches show ❌ as counterfeit
+4. Authentic batches show as verified with full provenance
+5. Fake batches show as counterfeit
 
 ## 💡 QR Code Format
 
