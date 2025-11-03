@@ -15,7 +15,7 @@ def create_virtual_environment():
     venv_path = "qr_venv"
     
     if os.path.exists(venv_path):
-        print(f"✅ Virtual environment already exists at {venv_path}")
+        print(f"Virtual environment already exists at {venv_path}")
         return venv_path
     
     print("🔧 Creating virtual environment...")
@@ -90,7 +90,7 @@ def run_qr_generator(python_executable):
         return False
 
 def main():
-    print("🏥 MediTrack QR Code Generator Setup")
+    print("MediTrack QR Code Generator Setup")
     print("=" * 40)
     
     # Check if requirements.txt exists
