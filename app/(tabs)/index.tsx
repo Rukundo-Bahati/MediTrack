@@ -1,25 +1,18 @@
 import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Provider as PaperProvider } from 'react-native-paper';
-import { NavigationContainer } from '@react-navigation/native';
-import RootNavigator from './src/navigation/RootNavigator';
-import { AppThemeProvider } from './src/lib/theme';
-import { AuthProvider } from './src/context/AuthContext';
-import { StatusBar } from 'react-native';
+import { useAuth } from '../context/AuthContext';
+import RoleTabs from '../navigation/RoleTabs';
+import OnboardingScreen from '../screens/OnboardingScreen';
 
-export default function App() {
-  return (
-    <SafeAreaProvider>
-      <AppThemeProvider>
-        <PaperProvider>
-          <AuthProvider>
-            <NavigationContainer>
-              <StatusBar barStyle="dark-content" />
-              <RootNavigator />
-            </NavigationContainer>
-          </AuthProvider>
-        </PaperProvider>
-      </AppThemeProvider>
-    </SafeAreaProvider>
-  );
+export default function HomeScreen() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
+
+  if (!user) {
+    return <OnboardingScreen />;
+  }
+
+  return <RoleTabs />;
 }

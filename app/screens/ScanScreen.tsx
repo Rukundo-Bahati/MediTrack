@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { verifyQR } from '@/utils/mockApi';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { Button, ActivityIndicator, Text, useTheme } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
-import { verifyQR } from '../utils/mockApi';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Button, Text, useTheme } from 'react-native-paper';
 
 export default function ScanScreen() {
-  const nav = useNavigation();
   const [permission, requestPermission] = useCameraPermissions();
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
@@ -24,7 +23,7 @@ export default function ScanScreen() {
       const qr = scanningResult.data;
       const result = await verifyQR(qr);
       // Navigate to result screen with scanned data
-      nav.navigate('VerifyResult' as never, { result } as never);
+      router.push({ pathname: '/verify-result', params: { result: JSON.stringify(result) } });
     } catch (err) {
       console.warn('Scan error', err);
       setLoading(false);
@@ -91,7 +90,7 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 20,
     borderWidth: 3,
-    borderColor: '#28A745',
+    borderColor: '#fc7f03',
   },
   loadingOverlay: {
     flex: 1,

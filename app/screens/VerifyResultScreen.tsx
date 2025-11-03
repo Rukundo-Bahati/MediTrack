@@ -1,300 +1,514 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Text, Card, Button, Divider } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { DESIGN } from '../lib/theme';
-import { MaterialIcons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { AlertTriangle, CheckCircle2, Clock, MapPin, Package, X, XCircle } from 'lucide-react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from '../../constants/colors';
 
-export default function VerifyResultScreen() {
-  const route: any = useRoute();
-  const nav = useNavigation();
-  const { result } = route.params || {};
+interface VerificationResult {
+  authentic: boolean;
+  message: string;
+  scannedAt: string;
+  batch?: {
+    drugName: string;
+    batchId: string;
+    lotNumber: string;
+    manufacturerName: string;
+    quantity: number;
+    expiryDate: string;
+    status: string;
+    batchHash: string;
+    txHash: string;
+    metadataURI: string;
+  };
+  provenance?: Array<{
+    id: string;
+    location: string;
+    timestamp: string;
+    handler: string;
+    status: string;
+    notes?: string;
+  }>;
+}
 
-  useEffect(() => {
-    (async () => {
-      if (!result) return;
-      const raw = await AsyncStorage.getItem('medi_cache_recent');
-      const arr = raw ? JSON.parse(raw) : [];
-      arr.unshift({ id: Date.now().toString(), batchId: result.batchId, name: result.drugName, result });
-      await AsyncStorage.setItem('medi_cache_recent', JSON.stringify(arr.slice(0, 20)));
-    })();
-  }, [result]);
+export default function VerificationScreen() {
+  const params = useLocalSearchParams();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
-  if (!result) return null;
+  const result: VerificationResult = params.resultData 
+    ? JSON.parse(params.resultData as string)
+    : null;
+
+  if (!result) {
+    return (
+      <View style={styles.container}>
+        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+          <Text style={styles.errorText}>No verification data available</Text>
+          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+            <Text style={styles.buttonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   const isAuthentic = result.authentic;
+  const batch = result.batch;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: DESIGN.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Hero Result Badge */}
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
+          <X size={24} color={Colors.text} />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={[
-          styles.resultBanner,
-          { backgroundColor: isAuthentic ? DESIGN.colors.accentContainer : DESIGN.colors.dangerContainer }
+          styles.statusCard,
+          { backgroundColor: isAuthentic ? Colors.accent + '15' : Colors.danger + '15' }
         ]}>
-          <MaterialIcons
-            name={isAuthentic ? 'check-circle' : 'cancel'}
-            size={72}
-            color={isAuthentic ? DESIGN.colors.accent : DESIGN.colors.danger}
-          />
-          <Text variant="displaySmall" style={[
-            styles.resultText,
-            { color: isAuthentic ? DESIGN.colors.accent : DESIGN.colors.danger, fontWeight: '700' }
+          {isAuthentic ? (
+            <CheckCircle2 size={64} color={Colors.accent} strokeWidth={2} />
+          ) : (
+            <XCircle size={64} color={Colors.danger} strokeWidth={2} />
+          )}
+          <Text style={[
+            styles.statusTitle,
+            { color: isAuthentic ? Colors.accent : Colors.danger }
           ]}>
-            {isAuthentic ? 'AUTHENTIC' : 'FAKE / REVOKED'}
+            {isAuthentic ? 'Verified Authentic' : 'Warning: Not Verified'}
           </Text>
-          <Text variant="bodyLarge" style={[styles.resultSubtext, { color: isAuthentic ? DESIGN.colors.accent : DESIGN.colors.danger }]}>
-            {isAuthentic ? '✓ This medicine is verified and safe' : '✗ Do not use this product'}
-          </Text>
+          <Text style={styles.statusMessage}>{result.message}</Text>
         </View>
 
-        {/* Drug Information Card */}
-        <Card style={[styles.infoCard, { borderLeftWidth: 4, borderLeftColor: isAuthentic ? DESIGN.colors.accent : DESIGN.colors.danger }]}>
-          <Card.Content>
-            <Text variant="titleLarge" style={{ fontWeight: '700', marginBottom: DESIGN.spacing.sm }}>
-              {result.drugName}
-            </Text>
-            <Text variant="bodyMedium" style={{ color: DESIGN.colors.muted, marginBottom: DESIGN.spacing.md }}>
-              {result.manufacturer}
-            </Text>
-
-            <View style={styles.infoGrid}>
-              <View style={styles.infoItem}>
-                <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginBottom: 4 }}>Batch ID</Text>
-                <Text variant="bodySmall" style={{ fontWeight: '600' }}>{result.batchId}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginBottom: 4 }}>Lot Number</Text>
-                <Text variant="bodySmall" style={{ fontWeight: '600' }}>{result.lot}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginBottom: 4 }}>Expiry Date</Text>
-                <Text variant="bodySmall" style={{ fontWeight: '600', color: new Date(result.expiry) < new Date() ? DESIGN.colors.danger : DESIGN.colors.text }}>
-                  {result.expiry}
-                </Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginBottom: 4 }}>Quantity</Text>
-                <Text variant="bodySmall" style={{ fontWeight: '600' }}>{result.quantity} units</Text>
+        {batch && (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Medicine Details</Text>
+              <View style={styles.detailCard}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Drug Name</Text>
+                  <Text style={styles.detailValue}>{batch.drugName}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Batch ID</Text>
+                  <Text style={[styles.detailValue, styles.monospace]}>{batch.batchId}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Lot Number</Text>
+                  <Text style={[styles.detailValue, styles.monospace]}>{batch.lotNumber}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Manufacturer</Text>
+                  <Text style={styles.detailValue}>{batch.manufacturerName}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Quantity</Text>
+                  <Text style={styles.detailValue}>{batch.quantity.toLocaleString()} units</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Expiry Date</Text>
+                  <Text style={[
+                    styles.detailValue,
+                    new Date(batch.expiryDate) < new Date() && styles.expiredText
+                  ]}>
+                    {new Date(batch.expiryDate).toLocaleDateString()}
+                    {new Date(batch.expiryDate) < new Date() && ' (EXPIRED)'}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Status</Text>
+                  <View style={[
+                    styles.statusBadge,
+                    { backgroundColor: batch.status === 'active' ? Colors.accent + '20' : Colors.danger + '20' }
+                  ]}>
+                    <Text style={[
+                      styles.statusBadgeText,
+                      { color: batch.status === 'active' ? Colors.accent : Colors.danger }
+                    ]}>
+                      {batch.status.toUpperCase()}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
-          </Card.Content>
-        </Card>
 
-        {/* Blockchain Verification Badge */}
-        {result.onChain && (
-          <Card style={[styles.chainCard, { backgroundColor: DESIGN.colors.accentContainer }]}>
-            <Card.Content>
-              <View style={styles.chainHeader}>
-                <MaterialIcons name="verified" size={24} color={DESIGN.colors.accent} />
-                <View style={{ flex: 1, marginLeft: DESIGN.spacing.md }}>
-                  <Text variant="titleMedium" style={{ fontWeight: '600', color: DESIGN.colors.accent }}>
-                    Verified on Blockchain
-                  </Text>
-                  <Text variant="bodySmall" style={{ color: DESIGN.colors.accent, marginTop: 4 }}>
-                    Batch registered on Ethereum Sepolia
-                  </Text>
-                </View>
-              </View>
-              {result.chainEvents && result.chainEvents.length > 0 && (
-                <Text variant="labelSmall" style={{ color: DESIGN.colors.accent, marginTop: DESIGN.spacing.sm }}>
-                  {result.chainEvents.length} blockchain events
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Package size={20} color={Colors.primary} />
+                <Text style={[styles.sectionTitle, { marginBottom: 0, marginLeft: 8 }]}>
+                  Blockchain Info
                 </Text>
-              )}
-            </Card.Content>
-          </Card>
-        )}
-
-        {/* Supply Chain History */}
-        {result.provenance.length > 0 && (
-          <View style={styles.section}>
-            <Text variant="titleLarge" style={[styles.sectionTitle, { color: DESIGN.colors.text }]}>
-              Supply Chain History
-            </Text>
-            {result.provenance.map((p: any, idx: number) => (
-              <View key={idx} style={styles.timelineItem}>
-                <View style={styles.timelineDot} />
-                {idx < result.provenance.length - 1 && <View style={styles.timelineLine} />}
-                <View style={styles.timelineContent}>
-                  <Card style={{ backgroundColor: DESIGN.colors.surface }}>
-                    <Card.Content>
-                      <Text variant="titleSmall" style={{ fontWeight: '600' }}>{p.event}</Text>
-                      <Text variant="bodySmall" style={{ color: DESIGN.colors.muted, marginTop: 4 }}>
-                        {new Date(p.timestamp).toLocaleString()}
-                      </Text>
-                      {p.location && (
-                        <Text variant="bodySmall" style={{ color: DESIGN.colors.text, marginTop: 6, fontWeight: '500' }}>
-                          📍 {p.location}
-                        </Text>
-                      )}
-                    </Card.Content>
-                  </Card>
+              </View>
+              <View style={styles.blockchainCard}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Batch Hash</Text>
+                  <Text style={[styles.detailValue, styles.monospace, styles.hashText]} numberOfLines={1}>
+                    {batch.batchHash}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Transaction Hash</Text>
+                  <Text style={[styles.detailValue, styles.monospace, styles.hashText]} numberOfLines={1}>
+                    {batch.txHash}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Metadata URI</Text>
+                  <Text style={[styles.detailValue, styles.monospace, styles.hashText]} numberOfLines={1}>
+                    {batch.metadataURI}
+                  </Text>
                 </View>
               </View>
-            ))}
-          </View>
-        )}
+            </View>
 
-        {/* Blockchain Events Timeline */}
-        {result.chainEvents && result.chainEvents.length > 0 && (
-          <View style={styles.section}>
-            <Text variant="titleLarge" style={[styles.sectionTitle, { color: DESIGN.colors.text }]}>
-              Blockchain Events
-            </Text>
-            {result.chainEvents.map((e: any, idx: number) => (
-              <Card key={idx} style={[styles.eventCard, { backgroundColor: DESIGN.colors.surface }]}>
-                <Card.Content>
-                  <View style={styles.eventHeader}>
-                    <View style={{ flex: 1 }}>
-                      <Text variant="titleSmall" style={{ fontWeight: '600' }}>{e.eventName}</Text>
-                      <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginTop: 4 }}>
-                        Block #{e.block}
-                      </Text>
+            {result.provenance && result.provenance.length > 0 && (
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <MapPin size={20} color={Colors.primary} />
+                  <Text style={[styles.sectionTitle, { marginBottom: 0, marginLeft: 8 }]}>
+                    Supply Chain Journey
+                  </Text>
+                </View>
+                {result.provenance.map((log, index) => (
+                  <View key={log.id} style={styles.logCard}>
+                    <View style={styles.logLine}>
+                      <View style={[
+                        styles.logDot,
+                        { backgroundColor: log.status === 'received' ? Colors.accent : Colors.primary }
+                      ]} />
+                      {index < result.provenance.length - 1 && (
+                        <View style={styles.logConnector} />
+                      )}
                     </View>
-                    <MaterialIcons name="link" size={20} color={DESIGN.colors.primary} />
+                    <View style={styles.logContent}>
+                      <View style={styles.logHeader}>
+                        <MapPin size={16} color={Colors.primary} />
+                        <Text style={styles.logLocation}>{log.location}</Text>
+                      </View>
+                      <View style={styles.logDetails}>
+                        <View style={styles.logDetail}>
+                          <Clock size={14} color={Colors.textSecondary} />
+                          <Text style={styles.logDetailText}>
+                            {new Date(log.timestamp).toLocaleString()}
+                          </Text>
+                        </View>
+                        <Text style={styles.logHandler}>Handler: {log.handler}</Text>
+                        {log.notes && (
+                          <Text style={styles.logNotes}>{log.notes}</Text>
+                        )}
+                      </View>
+                    </View>
                   </View>
-                  <Divider style={{ marginVertical: DESIGN.spacing.md }} />
-                  <Text variant="bodySmall" style={{ color: DESIGN.colors.muted, marginBottom: 8 }}>
-                    {e.formattedTime}
-                  </Text>
-                  <Text variant="bodySmall" style={{ fontFamily: 'monospace', fontSize: 10, color: DESIGN.colors.textTertiary }}>
-                    {e.txHash?.slice(0, 16)}...
-                  </Text>
-                </Card.Content>
-              </Card>
-            ))}
+                ))}
+              </View>
+            )}
+          </>
+        )}
+
+        {!isAuthentic && (
+          <View style={styles.warningCard}>
+            <AlertTriangle size={32} color={Colors.danger} />
+            <Text style={styles.warningTitle}>Report This Medicine</Text>
+            <Text style={styles.warningText}>
+              If you suspect counterfeit medicine, please report it immediately to help protect others.
+            </Text>
+            <TouchableOpacity style={styles.reportButton}>
+              <Text style={styles.reportButtonText}>Report Fake Medicine</Text>
+            </TouchableOpacity>
           </View>
         )}
 
-        {/* Actions */}
-        <View style={styles.actionsSection}>
-          {!isAuthentic && (
-            <Button
-              mode="contained"
-              icon="flag"
-              onPress={() => Alert.alert('Report', 'Report fake product flow (mock)')}
-              style={[styles.actionButton, { backgroundColor: DESIGN.colors.danger }]}
-              contentStyle={styles.actionButtonContent}
-              labelStyle={styles.actionButtonLabel}
-            >
-              Report Fake
-            </Button>
-          )}
-          <Button
-            mode="outlined"
-            onPress={() => nav.goBack()}
-            style={styles.actionButton}
-            contentStyle={styles.actionButtonContent}
-            labelStyle={styles.actionButtonLabel}
-          >
-            Done
-          </Button>
+        <View style={styles.timestampCard}>
+          <Clock size={16} color={Colors.textSecondary} />
+          <Text style={styles.timestampText}>
+            Scanned at {new Date(result.scannedAt).toLocaleString()}
+          </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+        <TouchableOpacity 
+          style={styles.primaryButton}
+          onPress={() => router.push('/(tabs)' as any)}
+        >
+          <Text style={styles.primaryButtonText}>Done</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: { paddingBottom: DESIGN.spacing.xl },
-  resultBanner: {
-    paddingVertical: DESIGN.spacing.xl,
-    paddingHorizontal: DESIGN.spacing.md,
-    alignItems: 'center',
-    borderRadius: DESIGN.radii.lg,
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  resultText: {
-    marginTop: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.sm,
-    letterSpacing: 1,
-  },
-  resultSubtext: {
-    textAlign: 'center',
-  },
-  infoCard: {
-    backgroundColor: DESIGN.colors.surface,
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
-  },
-  infoGrid: {
-    display: 'flex',
-    gap: DESIGN.spacing.md,
-  },
-  infoItem: {
-    marginBottom: DESIGN.spacing.sm,
-  },
-  chainCard: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
-  },
-  chainHeader: {
+  header: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    backgroundColor: Colors.background,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.backgroundSecondary,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  section: {
-    paddingHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-  },
-  sectionTitle: {
-    fontWeight: '600',
-    marginBottom: DESIGN.spacing.md,
-  },
-  timelineItem: {
-    marginBottom: DESIGN.spacing.lg,
-    position: 'relative',
-    paddingLeft: DESIGN.spacing.lg,
-  },
-  timelineDot: {
-    position: 'absolute',
-    left: 0,
-    top: 6,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: DESIGN.colors.primary,
-    borderWidth: 3,
-    borderColor: DESIGN.colors.background,
-  },
-  timelineLine: {
-    position: 'absolute',
-    left: 4.5,
-    top: 24,
-    width: 2,
-    height: 100,
-    backgroundColor: DESIGN.colors.outline,
-  },
-  timelineContent: {
+  scrollView: {
     flex: 1,
   },
-  eventCard: {
-    marginBottom: DESIGN.spacing.md,
-    borderRadius: DESIGN.radii.md,
+  scrollContent: {
+    paddingHorizontal: 20,
   },
-  eventHeader: {
+  statusCard: {
+    borderRadius: 20,
+    padding: 32,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  statusTitle: {
+    fontSize: 28,
+    fontWeight: '700' as const,
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  statusMessage: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  detailCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
-  actionsSection: {
-    paddingHorizontal: DESIGN.spacing.md,
-    gap: DESIGN.spacing.md,
-  },
-  actionButton: {
-    borderRadius: DESIGN.radii.lg,
-    marginBottom: DESIGN.spacing.sm,
-  },
-  actionButtonContent: {
-    paddingVertical: 10,
-  },
-  actionButtonLabel: {
+  detailLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    color: Colors.textSecondary,
+    flex: 1,
+  },
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    flex: 1,
+    textAlign: 'right',
+  },
+  monospace: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+  },
+  expiredText: {
+    color: Colors.danger,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  statusBadgeText: {
+    fontSize: 12,
+    fontWeight: '700' as const,
+  },
+  blockchainCard: {
+    backgroundColor: Colors.primary + '08',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.primary + '20',
+  },
+  hashText: {
+    fontSize: 11,
+  },
+  logCard: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  logLine: {
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  logDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 3,
+    borderColor: Colors.white,
+  },
+  logConnector: {
+    width: 2,
+    flex: 1,
+    backgroundColor: Colors.borderLight,
+    marginTop: 4,
+  },
+  logContent: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  logHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  logLocation: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    marginLeft: 6,
+    flex: 1,
+  },
+  logDetails: {
+    gap: 6,
+  },
+  logDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  logDetailText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+  },
+  logHandler: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+  },
+  logNotes: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    fontStyle: 'italic' as const,
+  },
+  warningCard: {
+    backgroundColor: Colors.danger + '10',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.danger + '30',
+    marginBottom: 24,
+  },
+  warningTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  warningText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  reportButton: {
+    backgroundColor: Colors.danger,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+  },
+  reportButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.white,
+  },
+  timestampCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+  },
+  timestampText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
+    backgroundColor: Colors.background,
+  },
+  primaryButton: {
+    backgroundColor: Colors.primary,
+    height: 52,
+    borderRadius: 26,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  primaryButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: Colors.white,
+  },
+  errorText: {
+    fontSize: 16,
+    color: Colors.danger,
+    textAlign: 'center',
+    marginTop: 40,
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 26,
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: Colors.white,
   },
 });

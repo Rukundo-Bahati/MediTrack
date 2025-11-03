@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "cli": {
+      "appVersionSource": "remote"
+    },
+    "dev": {
+      "port": 8088
+    }
+  }
+}

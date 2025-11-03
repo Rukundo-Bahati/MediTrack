@@ -1,403 +1,344 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Card, Button, Text, Chip, ActivityIndicator } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { DESIGN } from '../../lib/theme';
-
-interface Shipment {
-  id: string;
-  batchId: string;
-  drugName: string;
-  quantity: number;
-  status: 'pending' | 'in_transit' | 'delivered';
-  origin: string;
-  destination: string;
-  lastLocation: string;
-  timestamp: number;
-}
-
-const MOCK_SHIPMENTS: Shipment[] = [
-  {
-    id: 'ship_001',
-    batchId: 'batch:abc123',
-    drugName: 'Amoxicillin 500mg',
-    quantity: 500,
-    status: 'in_transit',
-    origin: 'Manufacturer Lagos',
-    destination: 'Distributor Hub Abuja',
-    lastLocation: 'Warehouse A, Lagos',
-    timestamp: Date.now() - 1000 * 60 * 60 * 2,
-  },
-  {
-    id: 'ship_002',
-    batchId: 'batch:def456',
-    drugName: 'Paracetamol 500mg',
-    quantity: 1000,
-    status: 'pending',
-    origin: 'Manufacturer Kano',
-    destination: 'Distributor Hub Lagos',
-    lastLocation: 'In packaging',
-    timestamp: Date.now() - 1000 * 60 * 60 * 24,
-  },
-  {
-    id: 'ship_003',
-    batchId: 'batch:ghi789',
-    drugName: 'Vitamin C 250mg',
-    quantity: 2000,
-    status: 'delivered',
-    origin: 'Manufacturer Cairo',
-    destination: 'Our Warehouse',
-    lastLocation: 'Distributor Hub Abuja',
-    timestamp: Date.now() - 1000 * 60 * 60 * 24 * 3,
-  },
-];
+import { useRouter } from 'expo-router';
+import { BarChart3, CheckCircle, Clock, Package, ScanLine, Truck } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors, RoleColors } from '../../../constants/colors';
+import { useAuth } from '../../context/AuthContext';
 
 export default function DistributorHome() {
-  const nav = useNavigation();
-  const [shipments, setShipments] = useState<Shipment[]>(MOCK_SHIPMENTS);
-  const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { user } = useAuth();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      // Simulate data refresh on screen focus
-      setLoading(true);
-      setTimeout(() => setLoading(false), 300);
-    }, [])
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return DESIGN.colors.warning;
-      case 'in_transit':
-        return DESIGN.colors.info;
-      case 'delivered':
-        return DESIGN.colors.accent;
-      default:
-        return DESIGN.colors.muted;
-    }
+  const handleScanVerify = () => {
+    router.push('/scan' as any);
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'schedule';
-      case 'in_transit':
-        return 'local-shipping';
-      case 'delivered':
-        return 'check-circle';
-      default:
-        return 'help';
-    }
+  const handleConfirmReceipt = () => {
+    router.push('/confirm-receipt' as any);
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Pending';
-      case 'in_transit':
-        return 'In Transit';
-      case 'delivered':
-        return 'Delivered';
-      default:
-        return 'Unknown';
-    }
+  const handleDispatchBatch = () => {
+    router.push('/dispatch-batch' as any);
   };
 
-  const countByStatus = (status: string) => shipments.filter(s => s.status === status).length;
-
-  const handleScanShipment = () => {
-    nav.navigate('Scan' as never);
-  };
-
-  const handleViewDetails = (shipment: Shipment) => {
-    nav.navigate('ShipmentDetails' as never, { shipment } as never);
+  const handleViewChainCustody = () => {
+    router.push('/chain-custody' as any);
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: DESIGN.colors.background }]}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text variant="displaySmall" style={[styles.title, { color: DESIGN.colors.primary }]}>
-            Shipments
-          </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: DESIGN.colors.muted }]}>
-            Track & manage incoming batches
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        <View>
+          <Text style={styles.greeting}>Welcome back,</Text>
+          <Text style={styles.userName}>{user?.name}</Text>
+        </View>
+        <View style={[styles.roleBadge, { backgroundColor: RoleColors.distributor + '20' }]}>
+          <Text style={[styles.roleText, { color: RoleColors.distributor }]}>
+            DISTRIBUTOR
           </Text>
         </View>
+      </View>
 
-        {/* Quick Stats Grid */}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.actionsGrid}>
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: RoleColors.distributor }]}
+            onPress={handleScanVerify}
+            activeOpacity={0.9}
+          >
+            <ScanLine size={32} color={Colors.white} strokeWidth={2} />
+            <Text style={styles.actionTitle}>Scan & Verify</Text>
+            <Text style={styles.actionDescription}>Verify batch authenticity</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: Colors.accent }]}
+            onPress={handleConfirmReceipt}
+            activeOpacity={0.9}
+          >
+            <CheckCircle size={32} color={Colors.white} strokeWidth={2} />
+            <Text style={styles.actionTitle}>Confirm Receipt</Text>
+            <Text style={styles.actionDescription}>Confirm batch ownership</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: Colors.info }]}
+            onPress={handleDispatchBatch}
+            activeOpacity={0.9}
+          >
+            <Truck size={32} color={Colors.white} strokeWidth={2} />
+            <Text style={styles.actionTitle}>Dispatch Batch</Text>
+            <Text style={styles.actionDescription}>Transfer to next holder</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: Colors.warning }]}
+            onPress={handleViewChainCustody}
+            activeOpacity={0.9}
+          >
+            <BarChart3 size={32} color={Colors.white} strokeWidth={2} />
+            <Text style={styles.actionTitle}>Chain of Custody</Text>
+            <Text style={styles.actionDescription}>View batch history</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.statsGrid}>
-          <Card style={[styles.statCard, { borderTopWidth: 4, borderTopColor: DESIGN.colors.info }]}>
-            <Card.Content>
-              <View style={styles.statIconContainer}>
-                <MaterialIcons name="local-shipping" size={28} color={DESIGN.colors.info} />
-              </View>
-              <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginTop: DESIGN.spacing.sm }}>
-                In Transit
-              </Text>
-              <Text variant="headlineSmall" style={{ fontWeight: '700', color: DESIGN.colors.text, marginTop: 4 }}>
-                {countByStatus('in_transit')}
-              </Text>
-            </Card.Content>
-          </Card>
+          <View style={[styles.statCard, { backgroundColor: RoleColors.distributor + '15' }]}>
+            <View style={[styles.statIcon, { backgroundColor: RoleColors.distributor + '25' }]}>
+              <Package size={24} color={RoleColors.distributor} />
+            </View>
+            <Text style={styles.statValue}>324</Text>
+            <Text style={styles.statLabel}>Batches Handled</Text>
+          </View>
 
-          <Card style={[styles.statCard, { borderTopWidth: 4, borderTopColor: DESIGN.colors.warning }]}>
-            <Card.Content>
-              <View style={styles.statIconContainer}>
-                <MaterialIcons name="schedule" size={28} color={DESIGN.colors.warning} />
-              </View>
-              <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginTop: DESIGN.spacing.sm }}>
-                Pending
-              </Text>
-              <Text variant="headlineSmall" style={{ fontWeight: '700', color: DESIGN.colors.text, marginTop: 4 }}>
-                {countByStatus('pending')}
-              </Text>
-            </Card.Content>
-          </Card>
+          <View style={[styles.statCard, { backgroundColor: Colors.accent + '15' }]}>
+            <View style={[styles.statIcon, { backgroundColor: Colors.accent + '25' }]}>
+              <CheckCircle size={24} color={Colors.accent} />
+            </View>
+            <Text style={styles.statValue}>298</Text>
+            <Text style={styles.statLabel}>Verified Authentic</Text>
+          </View>
 
-          <Card style={[styles.statCard, { borderTopWidth: 4, borderTopColor: DESIGN.colors.accent }]}>
-            <Card.Content>
-              <View style={styles.statIconContainer}>
-                <MaterialIcons name="check-circle" size={28} color={DESIGN.colors.accent} />
-              </View>
-              <Text variant="labelSmall" style={{ color: DESIGN.colors.muted, marginTop: DESIGN.spacing.sm }}>
-                Delivered
-              </Text>
-              <Text variant="headlineSmall" style={{ fontWeight: '700', color: DESIGN.colors.text, marginTop: 4 }}>
-                {countByStatus('delivered')}
-              </Text>
-            </Card.Content>
-          </Card>
+          <View style={[styles.statCard, { backgroundColor: Colors.info + '15' }]}>
+            <View style={[styles.statIcon, { backgroundColor: Colors.info + '25' }]}>
+              <Truck size={24} color={Colors.info} />
+            </View>
+            <Text style={styles.statValue}>156</Text>
+            <Text style={styles.statLabel}>Dispatched</Text>
+          </View>
+
+          <View style={[styles.statCard, { backgroundColor: Colors.warning + '15' }]}>
+            <View style={[styles.statIcon, { backgroundColor: Colors.warning + '25' }]}>
+              <Clock size={24} color={Colors.warning} />
+            </View>
+            <Text style={styles.statValue}>23</Text>
+            <Text style={styles.statLabel}>In Transit</Text>
+          </View>
         </View>
 
-        {/* Primary CTA */}
-        <Button
-          mode="contained"
-          icon="qr-code-scanner"
-          onPress={handleScanShipment}
-          style={[styles.scanButton, { backgroundColor: DESIGN.colors.primary }]}
-          contentStyle={styles.scanButtonContent}
-          labelStyle={styles.scanButtonLabel}
-        >
-          Scan & Add Transport Log
-        </Button>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Distribution Process</Text>
 
-        {/* Shipments List Header */}
-        <View style={styles.listHeader}>
-          <Text variant="titleLarge" style={[styles.listTitle, { color: DESIGN.colors.text }]}>
-            All Shipments
-          </Text>
-          <Text variant="labelSmall" style={{ color: DESIGN.colors.muted }}>
-            {shipments.length} total
-          </Text>
+          <View style={styles.stepCard}>
+            <View style={[styles.stepNumber, { backgroundColor: RoleColors.distributor }]}>
+              <Text style={styles.stepNumberText}>1</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Receive & Verify</Text>
+              <Text style={styles.stepDescription}>Scan QR code to verify batch authenticity</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepCard}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.accent }]}>
+              <Text style={styles.stepNumberText}>2</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Confirm Receipt</Text>
+              <Text style={styles.stepDescription}>Update blockchain with batch ownership</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepCard}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.info }]}>
+              <Text style={styles.stepNumberText}>3</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Dispatch</Text>
+              <Text style={styles.stepDescription}>Transfer batch to pharmacy or hospital</Text>
+            </View>
+          </View>
         </View>
 
-        {/* Loading State */}
-        {loading && <ActivityIndicator size="large" color={DESIGN.colors.primary} style={{ marginVertical: DESIGN.spacing.lg }} />}
-
-        {/* Shipments List */}
-        {!loading && (
-          shipments.length === 0 ? (
-            <Card style={styles.emptyCard}>
-              <Card.Content>
-                <View style={styles.emptyContent}>
-                  <MaterialIcons name="inbox" size={48} color={DESIGN.colors.muted} />
-                  <Text variant="titleMedium" style={[{ color: DESIGN.colors.text, marginTop: DESIGN.spacing.md }]}>
-                    No shipments
-                  </Text>
-                  <Text variant="bodySmall" style={[{ color: DESIGN.colors.muted, marginTop: DESIGN.spacing.sm, textAlign: 'center' }]}>
-                    Incoming shipments will appear here
-                  </Text>
-                </View>
-              </Card.Content>
-            </Card>
-          ) : (
-            shipments.map((shipment) => (
-              <Card key={shipment.id} style={styles.shipmentCard}>
-                <Card.Content>
-                  {/* Card Header with Status */}
-                  <View style={styles.cardHeader}>
-                    <View style={styles.cardLeft}>
-                      <View style={[styles.statusIconBg, { backgroundColor: getStatusColor(shipment.status) + '20' }]}>
-                        <MaterialIcons
-                          name={getStatusIcon(shipment.status)}
-                          size={24}
-                          color={getStatusColor(shipment.status)}
-                        />
-                      </View>
-                      <View style={styles.cardTitle}>
-                        <Text variant="titleSmall" numberOfLines={1} style={{ fontWeight: '600' }}>
-                          {shipment.drugName}
-                        </Text>
-                        <Text variant="bodySmall" numberOfLines={1} style={{ color: DESIGN.colors.muted, marginTop: 2 }}>
-                          {shipment.batchId}
-                        </Text>
-                      </View>
-                    </View>
-                    <Chip
-                      label={getStatusLabel(shipment.status)}
-                      style={{ backgroundColor: getStatusColor(shipment.status) }}
-                      textStyle={{ color: '#fff', fontSize: 10, fontWeight: '600' }}
-                      icon={() => <MaterialIcons name={getStatusIcon(shipment.status)} size={14} color="#fff" />}
-                    />
-                  </View>
-
-                  {/* Card Details */}
-                  <View style={styles.cardDetails}>
-                    <View style={styles.detailRow}>
-                      <View style={styles.detailItem}>
-                        <Text variant="labelSmall" style={{ color: DESIGN.colors.muted }}>Qty</Text>
-                        <Text variant="bodySmall" style={{ fontWeight: '600', marginTop: 4 }}>{shipment.quantity} units</Text>
-                      </View>
-                      <View style={styles.detailDivider} />
-                      <View style={styles.detailItem}>
-                        <Text variant="labelSmall" style={{ color: DESIGN.colors.muted }}>Last Location</Text>
-                        <Text variant="bodySmall" numberOfLines={1} style={{ fontWeight: '600', marginTop: 4, maxWidth: 140 }}>
-                          {shipment.lastLocation}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* Card Actions */}
-                  <View style={styles.cardFooter}>
-                    <Button
-                      mode="contained-tonal"
-                      size="small"
-                      icon="eye"
-                      onPress={() => handleViewDetails(shipment)}
-                      contentStyle={{ paddingHorizontal: 8 }}
-                    >
-                      View Details
-                    </Button>
-                  </View>
-                </Card.Content>
-              </Card>
-            ))
-          )
-        )}
+        <View style={styles.infoCard}>
+          <Truck size={32} color={RoleColors.distributor} />
+          <Text style={styles.infoTitle}>Secure Distribution Network</Text>
+          <Text style={styles.infoDescription}>
+            Ensure only verified medicines reach healthcare providers through blockchain-tracked distribution.
+          </Text>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingBottom: DESIGN.spacing.xl },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   header: {
-    paddingHorizontal: DESIGN.spacing.md,
-    paddingVertical: DESIGN.spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    backgroundColor: Colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
-  title: {
-    fontWeight: '700',
-    marginBottom: DESIGN.spacing.sm,
+  greeting: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 2,
   },
-  subtitle: { },
+  userName: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    flexShrink: 1,
+    maxWidth: '80%',
+  },
+  roleText: {
+    fontSize: 9,
+    fontWeight: '700' as const,
+  },
+  roleBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    maxWidth: 100,
+    alignItems: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    marginBottom: 32,
+  },
+  actionCard: {
+    flex: 1,
+    minWidth: '45%',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: Colors.white,
+    marginTop: 12,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  actionDescription: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+  },
   statsGrid: {
     flexDirection: 'row',
-    gap: DESIGN.spacing.sm,
-    paddingHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 32,
   },
   statCard: {
     flex: 1,
-    backgroundColor: DESIGN.colors.surface,
-    borderRadius: DESIGN.radii.md,
+    minWidth: '47%',
+    borderRadius: 16,
+    padding: 16,
   },
-  statIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: DESIGN.radii.md,
-    backgroundColor: DESIGN.colors.surfaceVariant,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scanButton: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
-  },
-  scanButtonContent: {
-    paddingVertical: 10,
-  },
-  scanButtonLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.md,
-  },
-  listTitle: {
-    fontWeight: '600',
-  },
-  emptyCard: {
-    marginHorizontal: DESIGN.spacing.md,
-    backgroundColor: DESIGN.colors.surface,
-    borderRadius: DESIGN.radii.lg,
-  },
-  emptyContent: {
-    alignItems: 'center',
-    paddingVertical: DESIGN.spacing.xl,
-  },
-  shipmentCard: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.md,
-    backgroundColor: DESIGN.colors.surface,
-    borderRadius: DESIGN.radii.lg,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: DESIGN.spacing.md,
-  },
-  cardLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: DESIGN.spacing.md,
-  },
-  statusIconBg: {
+  statIcon: {
     width: 48,
     height: 48,
-    borderRadius: DESIGN.radii.md,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 12,
   },
-  cardTitle: {
-    flex: 1,
+  statValue: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginBottom: 4,
   },
-  cardDetails: {
-    marginBottom: DESIGN.spacing.md,
-    backgroundColor: DESIGN.colors.surfaceVariant,
-    borderRadius: DESIGN.radii.md,
-    padding: DESIGN.spacing.md,
+  statLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
   },
-  detailRow: {
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginBottom: 16,
+  },
+  stepCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
-  detailItem: {
+  stepNumber: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  stepNumberText: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.white,
+  },
+  stepContent: {
     flex: 1,
   },
-  detailDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: DESIGN.colors.outline,
-    marginHorizontal: DESIGN.spacing.md,
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: Colors.text,
+    marginBottom: 4,
   },
-  cardFooter: {
-    borderTopWidth: 1,
-    borderTopColor: DESIGN.colors.outline,
-    paddingTop: DESIGN.spacing.md,
+  stepDescription: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
+  infoCard: {
+    backgroundColor: RoleColors.distributor + '10',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: RoleColors.distributor + '20',
+  },
+  infoTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  infoDescription: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });

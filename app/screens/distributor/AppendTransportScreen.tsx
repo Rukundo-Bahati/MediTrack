@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
-import { Card, Button, Text, TextInput, Chip } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { DESIGN } from '../../lib/theme';
-import { appendTransport } from '../../utils/mockApi';
-import { cacheTransportLogs } from '../../utils/syncQueue';
+import React, { useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Card, Chip, Text, TextInput } from 'react-native-paper';
+import { Colors } from '../../../constants/colors';
 
 const TRANSPORT_STATUSES = ['Pending', 'In Transit', 'At Hub', 'Delayed', 'Delivered'];
+
+// Mock appendTransport function
+const appendTransport = async (data: any) => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return { success: true };
+};
 
 export default function AppendTransportScreen() {
   const route = useRoute<any>();
@@ -34,16 +38,13 @@ export default function AppendTransportScreen() {
         timestamp: Date.now(),
       };
 
-      // Call mock API to append transport
-      const result = await appendTransport(batchId, log);
+      await appendTransport({ batchId, log });
       setSuccess(true);
-
-      // Reset form
+      
       setTimeout(() => {
         nav.goBack();
-      }, 1500);
+      }, 2000);
     } catch (err) {
-      console.warn('Save error', err);
       Alert.alert('Error', 'Failed to save transport log');
     } finally {
       setLoading(false);
@@ -51,24 +52,21 @@ export default function AppendTransportScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: DESIGN.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: Colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Button icon="arrow-left" onPress={() => nav.goBack()} compact>
-            Back
-          </Button>
           <Text variant="headlineSmall" style={styles.title}>
             Add Transport Log
           </Text>
-          <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>
+          <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>
             {shipment?.drugName || 'Batch'} • {batchId}
           </Text>
         </View>
 
         {/* Success Message */}
         {success && (
-          <Card style={[styles.successCard, { backgroundColor: DESIGN.colors.accent }]}>
+          <Card style={[styles.successCard, { backgroundColor: Colors.accent }]}>
             <Card.Content>
               <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>
                 ✓ Transport log saved successfully!
@@ -77,91 +75,93 @@ export default function AppendTransportScreen() {
           </Card>
         )}
 
-        {/* Form Card */}
+        {/* Form */}
         <Card style={styles.formCard}>
           <Card.Content>
             {/* Location Input */}
             <View style={styles.formGroup}>
-              <Text variant="labelSmall" style={{ marginBottom: DESIGN.spacing.sm }}>
+              <Text variant="labelSmall" style={{ marginBottom: 8 }}>
                 Current Location
               </Text>
               <TextInput
-                placeholder="e.g., Warehouse A, Lagos"
+                label="Enter current location"
                 value={location}
                 onChangeText={setLocation}
                 mode="outlined"
                 editable={!loading}
               />
-              <Text variant="bodySmall" style={{ color: DESIGN.colors.muted, marginTop: 6 }}>
+              <Text variant="bodySmall" style={{ color: Colors.textSecondary, marginTop: 6 }}>
                 Include city/region for clarity
               </Text>
             </View>
 
             {/* Status Selector */}
             <View style={styles.formGroup}>
-              <Text variant="labelSmall" style={{ marginBottom: DESIGN.spacing.sm }}>
+              <Text variant="labelSmall" style={{ marginBottom: 8 }}>
                 Transport Status
               </Text>
               <View style={styles.statusChips}>
                 {TRANSPORT_STATUSES.map((s) => (
                   <Chip
                     key={s}
-                    label={s}
                     selected={status === s}
                     onPress={() => setStatus(s)}
                     style={[
                       styles.statusChip,
-                      { backgroundColor: status === s ? DESIGN.colors.primary : '#e0e0e0' },
+                      { backgroundColor: status === s ? Colors.primary : '#e0e0e0' },
                     ]}
                     textStyle={{
-                      color: status === s ? '#fff' : DESIGN.colors.text,
+                      color: status === s ? '#fff' : Colors.text,
+                      fontWeight: '600',
                       fontSize: 12,
                     }}
-                  />
+                  >
+                    {s}
+                  </Chip>
                 ))}
               </View>
             </View>
 
             {/* Notes Input */}
             <View style={styles.formGroup}>
-              <Text variant="labelSmall" style={{ marginBottom: DESIGN.spacing.sm }}>
+              <Text variant="labelSmall" style={{ marginBottom: 8 }}>
                 Additional Notes (Optional)
               </Text>
               <TextInput
-                placeholder="e.g., Passed security, minor delay due to traffic"
+                label="Add any relevant notes"
                 value={notes}
                 onChangeText={setNotes}
                 mode="outlined"
                 multiline
-                numberOfLines={4}
+                numberOfLines={3}
                 editable={!loading}
               />
             </View>
           </Card.Content>
         </Card>
 
-        {/* Summary Card */}
+        {/* Summary */}
         <Card style={styles.summaryCard}>
           <Card.Content>
-            <Text variant="titleSmall" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.md }}>
+            <Text variant="titleSmall" style={{ fontWeight: '600', marginBottom: 16 }}>
               Summary
             </Text>
             <View style={styles.summaryRow}>
-              <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Batch ID:</Text>
+              <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Batch ID:</Text>
               <Text variant="bodySmall" style={{ fontWeight: '600' }}>{batchId}</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Location:</Text>
+              <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Location:</Text>
               <Text variant="bodySmall" style={{ fontWeight: '600' }}>{location || '—'}</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Status:</Text>
+              <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Status:</Text>
               <Text variant="bodySmall" style={{ fontWeight: '600' }}>{status}</Text>
             </View>
           </Card.Content>
         </Card>
 
-        {/* Action Buttons */}
+        {/* Actions */}
         <View style={styles.buttonGroup}>
           <Button
             mode="outlined"
@@ -175,11 +175,11 @@ export default function AppendTransportScreen() {
             mode="contained"
             onPress={handleSave}
             loading={loading}
-            disabled={loading}
+            disabled={loading || success}
             style={styles.saveButton}
             contentStyle={styles.saveButtonContent}
           >
-            {loading ? 'Saving...' : 'Save Transport Log'}
+            Save Log
           </Button>
         </View>
       </ScrollView>
@@ -189,18 +189,18 @@ export default function AppendTransportScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollView: { flex: 1, padding: DESIGN.spacing.md },
-  header: { marginBottom: DESIGN.spacing.lg },
-  title: { fontWeight: '600', marginTop: DESIGN.spacing.md, marginBottom: 4 },
-  successCard: { marginBottom: DESIGN.spacing.lg, borderRadius: DESIGN.radii.md },
-  formCard: { marginBottom: DESIGN.spacing.lg, backgroundColor: DESIGN.colors.surface },
-  formGroup: { marginBottom: DESIGN.spacing.lg },
-  statusChips: { flexDirection: 'row', flexWrap: 'wrap', gap: DESIGN.spacing.sm },
-  statusChip: { borderRadius: DESIGN.radii.md },
-  summaryCard: { marginBottom: DESIGN.spacing.lg, backgroundColor: DESIGN.colors.surface },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: DESIGN.spacing.md },
-  buttonGroup: { gap: DESIGN.spacing.md, marginBottom: DESIGN.spacing.xl },
-  cancelButton: { borderColor: DESIGN.colors.muted },
-  saveButton: { backgroundColor: DESIGN.colors.primary },
+  scrollView: { flex: 1, padding: 16 },
+  header: { marginBottom: 24 },
+  title: { fontWeight: '600', marginTop: 16, marginBottom: 4 },
+  successCard: { marginBottom: 24, borderRadius: 12 },
+  formCard: { marginBottom: 24, backgroundColor: Colors.white },
+  formGroup: { marginBottom: 24 },
+  statusChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  statusChip: { borderRadius: 12 },
+  summaryCard: { marginBottom: 24, backgroundColor: Colors.white },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
+  buttonGroup: { gap: 16, marginBottom: 32 },
+  cancelButton: { borderColor: Colors.textSecondary },
+  saveButton: { backgroundColor: Colors.primary },
   saveButtonContent: { paddingVertical: 8 },
 });

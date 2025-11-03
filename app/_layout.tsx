@@ -1,24 +1,48 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import React from 'react';
+import { StatusBar } from 'react-native';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import MediTrackLoader from './components/MediTrackLoader';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AppThemeProvider } from './lib/theme';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+function AppContent() {
+  const { loading } = useAuth();
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  if (loading) {
+    return <MediTrackLoader />;
+  }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <>
+      <StatusBar barStyle="dark-content" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="scan" />
+        <Stack.Screen name="verify-result" />
+        <Stack.Screen name="register-batch" />
+        <Stack.Screen name="shipment-details" />
+        <Stack.Screen name="append-transport" />
+        <Stack.Screen name="incidents" />
+        <Stack.Screen name="batch-audit" />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <AppThemeProvider>
+        <PaperProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </PaperProvider>
+      </AppThemeProvider>
+    </SafeAreaProvider>
   );
 }

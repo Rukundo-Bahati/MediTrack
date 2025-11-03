@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { TextInput, Button, Text, Card, ActivityIndicator } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { registerBatch } from '../utils/mockApi';
-import QRCode from 'react-native-qrcode-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DESIGN } from '../lib/theme';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Card, Text, TextInput } from 'react-native-paper';
+import QRCode from 'react-native-qrcode-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '../../constants/colors';
+
+// Mock registerBatch function
+const registerBatch = async (data: any) => {
+  await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+  return {
+    batchId: `BATCH-${Date.now()}`,
+    txHash: `0x${Math.random().toString(16).substr(2, 40)}`,
+    drugName: data.drugName,
+  };
+};
 
 export default function RegisterBatch() {
   const [drugName, setDrugName] = useState('Amoxicillin 500mg');
@@ -55,17 +63,17 @@ export default function RegisterBatch() {
 
   if (created) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: DESIGN.colors.background }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: Colors.background }]}>
         <ScrollView contentContainerStyle={styles.successContent} showsVerticalScrollIndicator={false}>
           {/* Success Banner */}
-          <Card style={[styles.successBanner, { backgroundColor: DESIGN.colors.accentContainer }]}>
+          <Card style={[styles.successBanner, { backgroundColor: Colors.accent + '20' }]}>
             <Card.Content>
               <View style={styles.successContent}>
-                <MaterialIcons name="check-circle" size={56} color={DESIGN.colors.accent} />
-                <Text variant="titleLarge" style={[styles.successTitle, { color: DESIGN.colors.accent, marginTop: DESIGN.spacing.md }]}>
+                <CheckCircle size={56} color={Colors.accent} />
+                <Text variant="titleLarge" style={[styles.successTitle, { color: Colors.accent, marginTop: 16 }]}>
                   Batch Registered
                 </Text>
-                <Text variant="bodyMedium" style={[styles.successSubtitle, { color: DESIGN.colors.accent }]}>
+                <Text variant="bodyMedium" style={[styles.successSubtitle, { color: Colors.accent }]}>
                   Your batch is now on the blockchain
                 </Text>
               </View>
@@ -73,31 +81,31 @@ export default function RegisterBatch() {
           </Card>
 
           {/* Batch Info Card */}
-          <Card style={[styles.batchCard, { backgroundColor: DESIGN.colors.surface }]}>
+          <Card style={[styles.batchCard, { backgroundColor: Colors.white }]}>
             <Card.Content>
-              <Text variant="titleSmall" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.md, color: DESIGN.colors.muted }}>
+              <Text variant="titleSmall" style={{ fontWeight: '600', marginBottom: 16, color: Colors.textSecondary }}>
                 Batch Information
               </Text>
               <View style={styles.infoRow}>
-                <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Drug</Text>
+                <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Drug</Text>
                 <Text variant="bodySmall" style={{ fontWeight: '600' }}>{created.drugName}</Text>
               </View>
               <View style={styles.infoRow}>
-                <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Batch ID</Text>
+                <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Batch ID</Text>
                 <Text variant="bodySmall" style={{ fontWeight: '600', fontFamily: 'monospace', fontSize: 11 }}>
                   {created.batchId}
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Transaction Hash</Text>
+                <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Transaction Hash</Text>
                 <Text variant="bodySmall" style={{ fontWeight: '600', fontFamily: 'monospace', fontSize: 10 }}>
                   {created.txHash?.slice(0, 16)}...
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <Text variant="bodySmall" style={{ color: DESIGN.colors.muted }}>Status</Text>
-                <View style={[styles.statusChip, { backgroundColor: DESIGN.colors.accentContainer }]}>
-                  <Text variant="labelSmall" style={{ color: DESIGN.colors.accent, fontWeight: '600' }}>
+                <Text variant="bodySmall" style={{ color: Colors.textSecondary }}>Status</Text>
+                <View style={[styles.statusChip, { backgroundColor: Colors.accent + '20' }]}>
+                  <Text variant="labelSmall" style={{ color: Colors.accent, fontWeight: '600' }}>
                     ✓ Confirmed
                   </Text>
                 </View>
@@ -106,15 +114,15 @@ export default function RegisterBatch() {
           </Card>
 
           {/* QR Code Section */}
-          <Card style={[styles.qrCard, { backgroundColor: DESIGN.colors.surface }]}>
+          <Card style={[styles.qrCard, { backgroundColor: Colors.white }]}>
             <Card.Content>
-              <Text variant="titleSmall" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.md, color: DESIGN.colors.text }}>
+              <Text variant="titleSmall" style={{ fontWeight: '600', marginBottom: 16, color: Colors.text }}>
                 Scan Code
               </Text>
               <View style={styles.qrContainer}>
                 <QRCode value={created.batchId} size={180} />
               </View>
-              <Text variant="bodySmall" style={{ textAlign: 'center', color: DESIGN.colors.muted, marginTop: DESIGN.spacing.md }}>
+              <Text variant="bodySmall" style={{ textAlign: 'center', color: Colors.textSecondary, marginTop: 16 }}>
                 Print or share this QR code with distributors and pharmacists
               </Text>
             </Card.Content>
@@ -126,7 +134,7 @@ export default function RegisterBatch() {
               mode="contained"
               icon="download"
               onPress={onDownloadQR}
-              style={[styles.actionButton, { backgroundColor: DESIGN.colors.primary }]}
+              style={[styles.actionButton, { backgroundColor: Colors.primary }]}
               contentStyle={styles.actionButtonContent}
             >
               Download QR
@@ -156,23 +164,23 @@ export default function RegisterBatch() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: DESIGN.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: Colors.background }]}>
       <ScrollView contentContainerStyle={styles.formContent} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text variant="displaySmall" style={[styles.title, { color: DESIGN.colors.primary }]}>
+          <Text variant="headlineMedium" style={[styles.title, { color: Colors.primary }]}>
             Register Batch
           </Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: DESIGN.colors.muted }]}>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: Colors.textSecondary }]}>
             Create a new batch record on the blockchain
           </Text>
         </View>
 
         {/* Form Card */}
-        <Card style={[styles.formCard, { backgroundColor: DESIGN.colors.surface }]}>
+        <Card style={[styles.formCard, { backgroundColor: Colors.white }]}>
           <Card.Content>
             {/* Drug Name */}
-            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.sm, color: DESIGN.colors.text }}>
+            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: 8, color: Colors.text }}>
               Drug Name *
             </Text>
             <TextInput
@@ -186,7 +194,7 @@ export default function RegisterBatch() {
             />
 
             {/* Lot Number */}
-            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.sm, marginTop: DESIGN.spacing.lg, color: DESIGN.colors.text }}>
+            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: 8, marginTop: 24, color: Colors.text }}>
               Lot Number *
             </Text>
             <TextInput
@@ -200,7 +208,7 @@ export default function RegisterBatch() {
             />
 
             {/* Expiry Date */}
-            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.sm, marginTop: DESIGN.spacing.lg, color: DESIGN.colors.text }}>
+            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: 8, marginTop: 24, color: Colors.text }}>
               Expiry Date *
             </Text>
             <TextInput
@@ -214,7 +222,7 @@ export default function RegisterBatch() {
             />
 
             {/* Quantity */}
-            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: DESIGN.spacing.sm, marginTop: DESIGN.spacing.lg, color: DESIGN.colors.text }}>
+            <Text variant="labelMedium" style={{ fontWeight: '600', marginBottom: 8, marginTop: 24, color: Colors.text }}>
               Quantity (Units) *
             </Text>
             <TextInput
@@ -234,7 +242,7 @@ export default function RegisterBatch() {
               onPress={onRegister}
               loading={loading}
               disabled={loading}
-              style={[styles.submitButton, { backgroundColor: DESIGN.colors.primary }]}
+              style={[styles.submitButton, { backgroundColor: Colors.primary }]}
               contentStyle={styles.submitButtonContent}
               labelStyle={styles.submitButtonLabel}
             >
@@ -244,15 +252,15 @@ export default function RegisterBatch() {
         </Card>
 
         {/* Info Banner */}
-        <Card style={[styles.infoBanner, { backgroundColor: DESIGN.colors.primaryContainer }]}>
+        <Card style={[styles.infoBanner, { backgroundColor: Colors.primary + '15' }]}>
           <Card.Content>
-            <View style={{ flexDirection: 'row', gap: DESIGN.spacing.md }}>
-              <MaterialIcons name="info" size={24} color={DESIGN.colors.primary} />
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <Info size={24} color={Colors.primary} />
               <View style={{ flex: 1 }}>
-                <Text variant="titleSmall" style={[{ fontWeight: '600', color: DESIGN.colors.primary }]}>
+                <Text variant="titleSmall" style={[{ fontWeight: '600', color: Colors.primary }]}>
                   Blockchain Registration
                 </Text>
-                <Text variant="bodySmall" style={[{ color: DESIGN.colors.primary, marginTop: DESIGN.spacing.sm }]}>
+                <Text variant="bodySmall" style={[{ color: Colors.primary, marginTop: 8 }]}>
                   Your batch will be registered on Ethereum Sepolia. A QR code will be generated for tracking.
                 </Text>
               </View>
@@ -266,29 +274,30 @@ export default function RegisterBatch() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  formContent: { paddingBottom: DESIGN.spacing.xl },
-  successContent: { paddingHorizontal: DESIGN.spacing.md, paddingVertical: DESIGN.spacing.lg, paddingBottom: DESIGN.spacing.xl },
+  formContent: { paddingBottom: 32 },
+  successContent: { paddingHorizontal: 16, paddingVertical: 24, paddingBottom: 32 },
   header: {
-    paddingHorizontal: DESIGN.spacing.md,
-    paddingVertical: DESIGN.spacing.lg,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
   title: {
     fontWeight: '700',
-    marginBottom: DESIGN.spacing.sm,
+    marginBottom: 8,
+    fontSize: 22,
   },
   subtitle: { },
   formCard: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 16,
   },
   input: {
-    marginBottom: DESIGN.spacing.md,
-    backgroundColor: DESIGN.colors.surfaceVariant,
+    marginBottom: 16,
+    backgroundColor: Colors.backgroundSecondary,
   },
   submitButton: {
-    marginTop: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
+    marginTop: 24,
+    borderRadius: 16,
   },
   submitButtonContent: {
     paddingVertical: 10,
@@ -298,58 +307,58 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   infoBanner: {
-    marginHorizontal: DESIGN.spacing.md,
-    borderRadius: DESIGN.radii.lg,
+    marginHorizontal: 16,
+    borderRadius: 16,
   },
   successBanner: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 16,
   },
   successTitle: {
     fontWeight: '700',
     textAlign: 'center',
   },
   successSubtitle: {
-    marginTop: DESIGN.spacing.sm,
+    marginTop: 8,
     textAlign: 'center',
   },
   batchCard: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 16,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DESIGN.spacing.md,
-    paddingBottom: DESIGN.spacing.md,
+    marginBottom: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: DESIGN.colors.outline,
+    borderBottomColor: Colors.borderLight,
   },
   statusChip: {
-    paddingHorizontal: DESIGN.spacing.md,
-    paddingVertical: DESIGN.spacing.sm,
-    borderRadius: DESIGN.radii.md,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
   },
   qrCard: {
-    marginHorizontal: DESIGN.spacing.md,
-    marginBottom: DESIGN.spacing.lg,
-    borderRadius: DESIGN.radii.lg,
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 16,
     alignItems: 'center',
   },
   qrContainer: {
     alignItems: 'center',
-    paddingVertical: DESIGN.spacing.lg,
+    paddingVertical: 24,
   },
   actions: {
-    paddingHorizontal: DESIGN.spacing.md,
-    gap: DESIGN.spacing.md,
+    paddingHorizontal: 16,
+    gap: 16,
   },
   actionButton: {
-    borderRadius: DESIGN.radii.lg,
-    marginBottom: DESIGN.spacing.sm,
+    borderRadius: 16,
+    marginBottom: 8,
   },
   actionButtonContent: {
     paddingVertical: 10,
