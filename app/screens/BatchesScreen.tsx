@@ -1,19 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import {
-    ArrowLeft,
-    Calendar,
-    Hash,
-    Layers,
-    Package
+  ArrowLeft,
+  Calendar,
+  Hash,
+  Layers,
+  Package
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
-    BounceIn,
-    FadeInDown,
-    FadeInUp,
-    SlideInRight
+  BounceIn,
+  FadeInDown,
+  FadeInUp,
+  SlideInRight
 } from 'react-native-reanimated';
 import { ModernButton } from '../../components/ui/modern-button';
 import { ModernCard } from '../../components/ui/modern-card';
@@ -67,7 +67,7 @@ export default function BatchesScreen() {
       setFilteredBatches(batches);
       return;
     }
-    
+
     const filtered = batches.filter(batch =>
       batch.drugName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       batch.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -148,88 +148,88 @@ export default function BatchesScreen() {
 
   return (
     <ScreenLayout style={styles.container}>
-      {/* Back Button */}
-      <Animated.View 
-        entering={FadeInDown.delay(100)}
-        style={styles.backButtonContainer}
-      >
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/(tabs)');
-            }
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.delay(200)}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.headerIcon}>
-            <Package size={32} color={Colors.primary} strokeWidth={2} />
-          </View>
-          <Text style={styles.title}>My Batches</Text>
-          <Text style={styles.subtitle}>
-            Manage and track your registered medicine batches
-          </Text>
-        </View>
-
-        {user?.role === 'manufacturer' && (
-          <Animated.View entering={BounceIn.delay(400)}>
-            <ModernButton
-              title="Register New Batch"
-              onPress={() => router.push('/register-batch')}
-              variant="primary"
-              size="medium"
-              style={styles.addButton}
-            />
-          </Animated.View>
-        )}
-      </Animated.View>
-
-      {/* Search Bar */}
-      <Animated.View 
-        entering={FadeInUp.delay(300)}
-        style={styles.searchContainer}
-      >
-        <ModernInput
-          placeholder="Search batches by name, ID, or lot number..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          containerStyle={styles.searchInput}
-        />
-      </Animated.View>
-
-      {/* Stats */}
-      <Animated.View 
-        entering={FadeInUp.delay(400)}
-        style={styles.statsContainer}
-      >
-        <ModernCard variant="filled" style={styles.statCard}>
-          <Text style={styles.statNumber}>{batches.length}</Text>
-          <Text style={styles.statLabel}>Total Batches</Text>
-        </ModernCard>
-        <ModernCard variant="filled" style={styles.statCard}>
-          <Text style={styles.statNumber}>{filteredBatches.length}</Text>
-          <Text style={styles.statLabel}>Showing</Text>
-        </ModernCard>
-      </Animated.View>
-
-      {/* Batches List */}
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+      <ScrollView
+        style={styles.mainScrollView}
+        contentContainerStyle={styles.mainScrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Back Button */}
+        <Animated.View
+          entering={FadeInDown.delay(100)}
+          style={styles.backButtonContainer}
+        >
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace('/(tabs)');
+              }
+            }}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Header */}
+        <Animated.View
+          entering={FadeInDown.delay(200)}
+          style={styles.header}
+        >
+          <View style={styles.headerContent}>
+            <View style={styles.headerIcon}>
+              <Package size={32} color={Colors.primary} strokeWidth={2} />
+            </View>
+            <Text style={styles.title}>My Batches</Text>
+            <Text style={styles.subtitle}>
+              Manage and track your registered medicine batches
+            </Text>
+          </View>
+
+          {user?.role === 'manufacturer' && (
+            <Animated.View entering={BounceIn.delay(400)}>
+              <ModernButton
+                title="Register New Batch"
+                onPress={() => router.push('/register-batch')}
+                variant="primary"
+                size="medium"
+                style={styles.addButton}
+              />
+            </Animated.View>
+          )}
+        </Animated.View>
+
+        {/* Search Bar */}
+        <Animated.View
+          entering={FadeInUp.delay(300)}
+          style={styles.searchContainer}
+        >
+          <ModernInput
+            placeholder="Search batches..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            containerStyle={styles.searchInput}
+          />
+        </Animated.View>
+
+        {/* Stats */}
+        <Animated.View
+          entering={FadeInUp.delay(400)}
+          style={styles.statsContainer}
+        >
+          <ModernCard variant="filled" style={styles.statCard}>
+            <Text style={styles.statNumber}>{batches.length}</Text>
+            <Text style={styles.statLabel}>Total Batches</Text>
+          </ModernCard>
+          <ModernCard variant="filled" style={styles.statCard}>
+            <Text style={styles.statNumber}>{filteredBatches.length}</Text>
+            <Text style={styles.statLabel}>Showing</Text>
+          </ModernCard>
+        </Animated.View>
+
+        {/* Batches List */}
         {loading ? (
           <Animated.View entering={FadeInUp.delay(500)} style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading batches...</Text>
@@ -241,8 +241,8 @@ export default function BatchesScreen() {
               {searchQuery ? 'No batches found' : 'No batches registered yet'}
             </Text>
             <Text style={styles.emptySubtitle}>
-              {searchQuery 
-                ? 'Try adjusting your search terms' 
+              {searchQuery
+                ? 'Try adjusting your search terms'
                 : 'Register your first batch to get started'
               }
             </Text>
@@ -353,18 +353,19 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
-  // Scroll Styles
-  scrollView: {
+  // Main Scroll Styles
+  mainScrollView: {
     flex: 1,
   },
-  scrollContent: {
-    paddingHorizontal: Spacing.layout.container,
+  mainScrollContent: {
+    flexGrow: 1,
     paddingBottom: Spacing.xl,
   },
 
   // Batch Card Styles
   batchesList: {
     gap: Spacing.md,
+    paddingHorizontal: Spacing.layout.container,
   },
   batchCard: {
     marginBottom: 0,
