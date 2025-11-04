@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-export type UserRole = 'consumer' | 'pharmacist' | 'distributor' | 'manufacturer' | 'regulator' | 'admin' | 'guest';
+export type UserRole = 'pharmacist' | 'distributor' | 'manufacturer' | 'regulator' | 'admin' | 'guest';
 
 type User = {
   id: string;

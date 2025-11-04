@@ -1,0 +1,21 @@
+{
+  "name": "meditrack-blockchain",
+  "version": "1.0.0",
+  "description": "Blockchain smart contracts for MediTrack",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:local": "hardhat run contracts/deploy.js --network hardhat",
+    "deploy:sepolia": "hardhat run contracts/deploy.js --network sepolia",
+    "deploy:mumbai": "hardhat run contracts/deploy.js --network mumbai",
+    "deploy:bsc": "hardhat run contracts/deploy.js --network bscTestnet",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "verify:sepolia": "hardhat verify --network sepolia",
+    "verify:mumbai": "hardhat verify --network mumbai"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.2",
+    "hardhat": "^2.17.1",
+    "dotenv": "^16.3.1"
+  }
+}

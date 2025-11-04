@@ -21,7 +21,7 @@ export interface RegistrationData {
   email: string;
   password: string;
   confirmPassword: string;
-  selectedRole: Exclude<UserRole, 'consumer'>;
+  selectedRole: Exclude<UserRole, 'guest' | 'admin'>;
   
   // Role-specific fields
   companyName: string;

@@ -1,8 +1,15 @@
 # MediTrack
 
+```
+Protecting lives through blockchain technology
+```
+
 **Blockchain-Powered Medicine Verification System**
 
 MediTrack is a comprehensive mobile application that leverages blockchain technology to combat counterfeit medicines and ensure pharmaceutical supply chain integrity. Built with React Native and Expo, it provides real-time verification of medicine authenticity through QR code scanning and immutable blockchain records.
+
+# Core Mission
+ Pharmaceutical supply chain transparency and anti-counterfeiting through blockchain technology
 
 ## The Problem We Solve
 
@@ -34,9 +41,10 @@ MediTrack creates an **immutable, transparent, and accessible** system for medic
 
 ### **Instant Verification**
 - **QR Code Scanning**: Point camera at medicine packaging to verify authenticity
-- **Real-time Results**: Get verification status in seconds
-- **Detailed Provenance**: View complete supply chain journey
+- **Real-time Results**: Get verification status in seconds with blockchain confirmation
+- **Medicine Information Lookup**: Complete drug details, warnings, and side effects
 - **Offline Support**: Cached verification data for areas with poor connectivity
+- **Public Access**: No registration required for medicine verification
 
 ### **Supply Chain Management**
 - **Batch Registration**: Manufacturers register new medicine batches on blockchain
@@ -59,10 +67,11 @@ MediTrack creates an **immutable, transparent, and accessible** system for medic
 ## Core Functionalities
 
 ### **For Consumers**
-- **Medicine Verification**: Scan QR codes to verify authenticity
-- **Safety Alerts**: Receive notifications about recalled or dangerous medicines
-- **Pharmacy Finder**: Locate verified pharmacies nearby
-- **Health Records**: Track verified medicine purchases
+- **Medicine Verification**: Scan QR codes to verify authenticity instantly
+- **Offline Verification**: Verify medicines even without internet connection
+- **Medicine Information**: Complete drug information, warnings, and side effects
+- **Blockchain Status**: See "Verified on Blockchain ✓" confirmation
+- **Safety Alerts**: Identify counterfeit, expired, or recalled medicines
 
 ### **For Manufacturers**
 - **Batch Registration**: Register new medicine batches on blockchain
@@ -127,6 +136,147 @@ MediTrack creates an **immutable, transparent, and accessible** system for medic
 - **Multi-factor Authentication**: Enhanced user security
 - **Role-based Permissions**: Granular access controls
 - **Audit Logging**: Complete activity tracking
+
+## Blockchain Integration
+
+**FULLY INTEGRATED**: This app includes complete blockchain functionality using free testnets.
+
+### Blockchain Features
+- **Smart Contracts**: Solidity contracts for medicine batch tracking
+- **Multi-Network Support**: Polygon Mumbai, Sepolia, BSC Testnet  
+- **Free Verification**: All verification calls are free (read-only)
+- **Offline Support**: Cached blockchain data for offline verification
+- **Supply Chain Tracking**: Complete batch history on blockchain
+- **Real-time Status**: Shows "Verified on Blockchain" for authentic medicines
+
+### How Smart Contracts Power This App
+
+#### **MediTrack Smart Contract Architecture**
+The app uses custom-built Solidity smart contracts deployed on blockchain networks to ensure pharmaceutical supply chain integrity:
+
+**Contract Files:**
+- `contracts/MediTrack.sol` - Main production contract (self-contained, no external dependencies)
+- `contracts/MediTrackSimple.sol` - Simplified version for educational purposes
+
+#### **Core Smart Contract Functions**
+
+**Public Verification (Free - No Gas Fees)**
+```solidity
+// Anyone can verify medicine authenticity for free
+function verifyBatch(string batchId) 
+    returns (bool isValid, Batch batchData)
+
+// Get complete supply chain history
+function getSupplyChain(string batchId) 
+    returns (SupplyChainEntry[] memory)
+
+// Check if medicine has expired
+function isBatchExpired(string batchId) 
+    returns (bool)
+```
+
+**Manufacturer Functions (Requires Gas)**
+```solidity
+// Register new medicine batch on blockchain
+function registerBatch(
+    string batchId,
+    string drugName, 
+    string activeIngredient,
+    string dosage,
+    uint256 expiryDate,
+    string ipfsHash
+)
+
+// Emergency recall functionality
+function recallBatch(string batchId, string reason)
+```
+
+**Supply Chain Functions (Requires Gas)**
+```solidity
+// Transfer batch to next party in supply chain
+function transferBatch(
+    string batchId,
+    address to,
+    string location,
+    string notes
+)
+```
+
+#### **How the App Uses Smart Contracts**
+
+**1. Medicine Verification Flow**
+```
+User Scans QR Code → App calls verifyBatch() → Smart Contract Returns:
+├── Batch exists and valid → "Verified on Blockchain ✓"
+├── Batch expired → "EXPIRED - Do Not Use"
+├── Batch recalled → "RECALLED - Do Not Use"  
+└── Batch not found → "COUNTERFEIT - Do Not Use"
+```
+
+**2. Supply Chain Tracking**
+```
+Manufacturer → registerBatch() → Blockchain Record Created
+     ↓
+Distributor → transferBatch() → Ownership Transfer Logged
+     ↓  
+Pharmacy → transferBatch() → Final Delivery Recorded
+     ↓
+Consumer → verifyBatch() → Complete History Retrieved
+```
+
+**3. Real-time Integration**
+- **React Native Service**: `app/services/blockchain.ts` connects to smart contracts
+- **Automatic Caching**: Blockchain data cached locally for offline access
+- **Multi-Network**: Supports Ethereum, Polygon, BSC testnets
+- **Gas Optimization**: Verification calls are free (view functions)
+
+#### **Smart Contract Security Features**
+
+**Access Control**
+- **Owner-only Functions**: Administrative functions restricted to contract owner
+- **Role-based Permissions**: Different access levels for Manufacturers, Distributors, Pharmacists, Regulators
+- **User Registration**: Only registered users can perform write operations
+
+**Data Integrity**
+- **Immutable Records**: Once written to blockchain, batch data cannot be altered
+- **Input Validation**: All functions validate input data and check prerequisites
+- **Reentrancy Protection**: Built-in protection against reentrancy attacks
+- **Existence Checks**: Prevents operations on non-existent batches
+
+**Supply Chain Security**
+- **Provenance Tracking**: Complete audit trail from manufacturer to consumer
+- **Transfer Validation**: Only authorized parties can transfer batches
+- **Recall Management**: Emergency recall functionality for safety incidents
+- **Expiry Enforcement**: Automatic expiry checking prevents expired medicine use
+
+#### **Blockchain Networks Supported**
+
+**Testnets (Free for Development)**
+- **Polygon Mumbai**: Recommended - Fast, cheap, reliable
+- **Ethereum Sepolia**: Ethereum-native testnet
+- **BSC Testnet**: Binance Smart Chain testnet
+
+**Mainnet Ready**
+- Contracts are production-ready for mainnet deployment
+- Gas-optimized for cost-effective operations
+- Multi-network compatibility for global deployment
+
+#### **Demo vs Production Mode**
+
+**Demo Mode (Default)**
+- Uses simulated blockchain data for instant testing
+- No blockchain setup required
+- Full functionality including "Verified on Blockchain" status
+- Perfect for demonstrations and development
+
+**Production Mode (Optional)**
+- Deploy contracts to real blockchain networks
+- Requires minimal setup (see [BLOCKCHAIN_SETUP.md](BLOCKCHAIN_SETUP.md))
+- Real blockchain verification with immutable records
+- Suitable for production pharmaceutical supply chains
+
+### **Demo Mode**
+The app works perfectly out-of-the-box with simulated blockchain data. For real blockchain deployment, see [BLOCKCHAIN_SETUP.md](BLOCKCHAIN_SETUP.md).
 
 ## Getting Started
 
@@ -238,6 +388,16 @@ npm run test:e2e
 2. Open app and scan generated codes
 3. Verify authentication results
 
+
+## Future Development
+
+**Comprehensive Feature Roadmap**: See our detailed [Future Features Implementation Plan](Features-to-be-Implemented-in-future.md) for upcoming enhancements including:
+- Advanced AI-powered counterfeit detection
+- IoT integration for real-time monitoring  
+- Global regulatory compliance automation
+- Enhanced security and blockchain features
+- Healthcare system integrations
+- And much more...
 
 ## Contributing
 

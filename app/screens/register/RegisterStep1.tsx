@@ -12,7 +12,7 @@ import { UserRole } from '../../context/AuthContext';
 import { RegistrationData } from '../RegisterScreen';
 
 const BUSINESS_ROLES: { 
-  value: Exclude<UserRole, 'consumer'>; 
+  value: Exclude<UserRole, 'guest' | 'admin'>; 
   label: string; 
   description: string;
   icon: any;

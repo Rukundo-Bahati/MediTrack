@@ -19,7 +19,7 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   const handleScanPress = () => {
-    router.push('/scan' as any);
+    router.push('/verify-medicine' as any);
   };
 
   const handleBusinessLogin = () => {
