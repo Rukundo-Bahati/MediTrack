@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { useRouter } from 'expo-router';
-import { Package, ScanLine, Shield } from 'lucide-react-native';
+import { Package, ScanLine } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -8,7 +8,6 @@ import Animated, {
   FadeInDown,
   FadeInRight,
   FadeInUp,
-  runOnJS,
   SlideInRight,
   useAnimatedStyle,
   useSharedValue,
@@ -26,7 +25,7 @@ const slides = [
     id: 1,
     title: 'Counterfeit Drugs Kill',
     description: '500,000 deaths annually in developing regions from fake medicines. We can stop this.',
-    Icon: Shield,
+    Icon: Package,
     color: Colors.primary,
   },
   {
@@ -70,15 +69,7 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
-      // Animate content out and then change slide
-      contentOpacity.value = withTiming(0, { duration: 200 }, () => {
-        runOnJS(() => {
-          setCurrentIndex(currentIndex + 1);
-          contentOpacity.value = withDelay(100, withTiming(1, { duration: 300 }));
-          iconScale.value = 0;
-          iconScale.value = withDelay(200, withSpring(1, { damping: 15, stiffness: 300 }));
-        })();
-      });
+      setCurrentIndex(currentIndex + 1);
     } else {
       handleGetStarted();
     }
@@ -90,7 +81,7 @@ export default function OnboardingScreen() {
 
   const handleGetStarted = async () => {
     await completeOnboarding();
-    router.replace('/login' as any);
+    router.replace('/welcome' as any);
   };
 
   const currentSlide = slides[currentIndex];
@@ -191,7 +182,7 @@ export default function OnboardingScreen() {
           onPress={handleNext}
           onPressIn={handleButtonPressIn}
           onPressOut={handleButtonPressOut}
-          style={[styles.button, { backgroundColor: currentSlide.color }, buttonAnimatedStyle]}
+          style={[styles.button, { backgroundColor: slides[currentIndex].color }, buttonAnimatedStyle]}
           activeOpacity={1}
         >
           <Text style={styles.buttonText}>

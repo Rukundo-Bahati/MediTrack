@@ -1,33 +1,33 @@
+import { ModernButton, ModernInput, ModernSelector } from '@/components/ui';
+import { Spacing } from '@/constants/spacing';
+import { Typography } from '@/constants/typography';
 import { useRouter } from 'expo-router';
-import { Shield } from 'lucide-react-native';
+import { ArrowLeft, Package } from 'lucide-react-native';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, RoleColors } from '../../constants/colors';
 import { useAuth, UserRole } from '../context/AuthContext';
 
-const ROLES: { value: UserRole; label: string; description: string }[] = [
-  { value: 'consumer', label: 'Consumer', description: 'Verify medicine authenticity' },
-  { value: 'pharmacist', label: 'Pharmacist', description: 'Manage inventory & verify stock' },
-  { value: 'manufacturer', label: 'Manufacturer', description: 'Register batches & track' },
-  { value: 'distributor', label: 'Distributor', description: 'Track shipments & logistics' },
-  { value: 'regulator', label: 'Regulator', description: 'Audit trails & compliance' },
+const BUSINESS_ROLES: { value: Exclude<UserRole, 'consumer' | 'admin'>; label: string; description: string; color: string }[] = [
+  { value: 'manufacturer', label: 'Manufacturer', description: 'Register batches & track', color: RoleColors.manufacturer },
+  { value: 'distributor', label: 'Distributor', description: 'Track shipments & logistics', color: RoleColors.distributor },
+  { value: 'pharmacist', label: 'Pharmacist', description: 'Manage inventory & verify stock', color: RoleColors.pharmacist },
+  { value: 'regulator', label: 'Regulator', description: 'Audit trails & compliance', color: RoleColors.regulator },
 ];
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState<UserRole>('consumer');
+  const [selectedRole, setSelectedRole] = useState<Exclude<UserRole, 'consumer' | 'admin'>>('manufacturer');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -54,132 +54,81 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGuestLogin = async () => {
-    setIsLoading(true);
-    try {
-      await login(selectedRole, { name: 'Guest User' });
-      router.replace('/(tabs)');
-    } catch {
-      setError('Guest login failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={[
-          styles.scrollContent, 
-          { 
-            paddingTop: insets.top + 20, 
-            paddingBottom: insets.bottom + 20 
+          styles.scrollContent,
+          {
+            paddingTop: insets.top + 20,
+            paddingBottom: insets.bottom + 20
           }
         ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={24} color={Colors.primary} />
+          </TouchableOpacity>
           <View style={styles.logoContainer}>
-            <Shield size={48} color={Colors.primary} strokeWidth={2} />
+            <Package size={48} color={Colors.primary} />
           </View>
           <Text style={styles.title}>MediTrack</Text>
-          <Text style={styles.subtitle}>Blockchain Medicine Verification</Text>
+          <Text style={styles.subtitle}>Business Login</Text>
         </View>
 
         <View style={styles.form}>
           <Text style={styles.label}>Select Your Role</Text>
-          <View style={styles.roleGrid}>
-            {ROLES.map((role) => (
-              <TouchableOpacity
-                key={role.value}
-                style={[
-                  styles.roleCard,
-                  selectedRole === role.value && styles.roleCardSelected,
-                  { 
-                    borderColor: selectedRole === role.value 
-                      ? RoleColors[role.value] 
-                      : Colors.border 
-                  },
-                ]}
-                onPress={() => setSelectedRole(role.value)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.roleIndicator,
-                    { backgroundColor: RoleColors[role.value] + '20' },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.roleIndicatorDot,
-                      { backgroundColor: RoleColors[role.value] },
-                      selectedRole === role.value && styles.roleIndicatorDotActive,
-                    ]}
-                  />
-                </View>
-                <Text 
-                  style={[
-                    styles.roleLabel, 
-                    selectedRole === role.value && styles.roleLabelSelected
-                  ]}
-                >
-                  {role.label}
-                </Text>
-                <Text style={styles.roleDescription}>{role.description}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <ModernSelector
+            options={BUSINESS_ROLES}
+            selectedValue={selectedRole}
+            onSelect={(value) => setSelectedRole(value as Exclude<UserRole, 'consumer' | 'admin'>)}
+            variant="grid"
+            columns={2}
+            style={styles.roleSelector}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="your.email@example.com"
-              placeholderTextColor={Colors.textSecondary}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              editable={!isLoading}
-            />
-          </View>
+          <ModernInput
+            label="Email"
+            placeholder="your.email@example.com"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            editable={!isLoading}
+            containerStyle={styles.inputGroup}
+          />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor={Colors.textSecondary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
-          </View>
+          <ModernInput
+            label="Password"
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            editable={!isLoading}
+            containerStyle={styles.inputGroup}
+          />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-          <TouchableOpacity
-            style={[
-              styles.button, 
-              styles.primaryButton, 
-              isLoading && styles.buttonDisabled
-            ]}
+          <ModernButton
+            title="Login"
             onPress={handleLogin}
+            variant="primary"
+            size="large"
             disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={Colors.white} />
-            ) : (
-              <Text style={styles.buttonText}>Login</Text>
-            )}
-          </TouchableOpacity>
-
+            loading={isLoading}
+            style={styles.loginButton}
+          />
+          {/* 
           <TouchableOpacity
             style={[styles.button, styles.secondaryButton]}
             onPress={handleGuestLogin}
@@ -189,11 +138,11 @@ export default function LoginScreen() {
             <Text style={[styles.buttonText, styles.secondaryButtonText]}>
               Continue as Guest
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don&apos;t have an account? </Text>
-            <TouchableOpacity onPress={() => console.log('Navigate to register')}>
+            <TouchableOpacity onPress={() => router.push('/register' as any)}>
               <Text style={styles.linkText}>Register</Text>
             </TouchableOpacity>
           </View>
@@ -215,6 +164,13 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 32,
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    padding: 8,
   },
   logoContainer: {
     width: 80,
@@ -226,140 +182,51 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700' as const,
+    ...Typography.h1,
     color: Colors.primary,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 14,
+    ...Typography.bodySmall,
     color: Colors.textSecondary,
   },
   form: {
     flex: 1,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600' as const,
+    ...Typography.label,
     color: Colors.primary,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
-  roleGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
+  roleSelector: {
+    marginBottom: Spacing.lg,
   },
-  roleCard: {
-    flex: 1,
-    minWidth: '45%',
-    backgroundColor: Colors.backgroundSecondary,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    padding: 12,
-    alignItems: 'center',
-  },
-  roleCardSelected: {
-    backgroundColor: Colors.white,
-    borderWidth: 2,
-  },
-  roleIndicator: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  roleIndicatorDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  roleIndicatorDotActive: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-  },
-  roleLabel: {
-    fontSize: 13,
-    fontWeight: '600' as const,
-    color: Colors.text,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  roleLabelSelected: {
-    fontWeight: '700' as const,
-    color: Colors.primary,
-  },
-  roleDescription: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
+
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: Spacing.component.margin,
   },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: Colors.text,
-    backgroundColor: Colors.white,
+  loginButton: {
+    marginTop: Spacing.lg,
   },
-  button: {
-    height: 52,
-    borderRadius: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  primaryButton: {
-    backgroundColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  secondaryButton: {
-    backgroundColor: Colors.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: Colors.white,
-  },
-  secondaryButtonText: {
-    color: Colors.text,
-  },
+
   errorText: {
+    ...Typography.bodySmall,
     color: Colors.danger,
-    fontSize: 14,
-    marginBottom: 12,
+    marginBottom: Spacing.base,
     textAlign: 'center',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: Spacing.lg,
   },
   footerText: {
-    fontSize: 14,
+    ...Typography.bodySmall,
     color: Colors.textSecondary,
   },
   linkText: {
-    fontSize: 14,
+    ...Typography.bodySmall,
     fontWeight: '600' as const,
     color: Colors.primary,
   },

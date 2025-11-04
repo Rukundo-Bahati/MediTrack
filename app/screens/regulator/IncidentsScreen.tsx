@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { Info, MapPin, User } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Card, Chip, Dialog, Portal, Text } from 'react-native-paper';

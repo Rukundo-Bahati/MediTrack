@@ -1,6 +1,6 @@
 import { AlertTriangle, Calendar, CheckCircle, Package, Search, XCircle } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, RoleColors } from '../../../constants/colors';
 
@@ -112,14 +112,13 @@ export default function BatchAuditScreen() {
         <View style={styles.searchSection}>
           <View style={styles.searchContainer}>
             <Search size={20} color={Colors.textSecondary} />
-            <Text
+            <TextInput
               style={styles.searchInput}
               onChangeText={setSearchQuery}
               placeholder="Enter batch ID to audit"
               placeholderTextColor={Colors.textSecondary}
-            >
-              {searchQuery}
-            </Text>
+              value={searchQuery}
+            />
           </View>
           
           <TouchableOpacity

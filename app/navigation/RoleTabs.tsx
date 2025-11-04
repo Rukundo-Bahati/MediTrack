@@ -27,13 +27,27 @@ export default function RoleTabs() {
         tabBarStyle: {
             backgroundColor: Colors.white,
             borderTopColor: Colors.borderLight,
+            borderTopWidth: 1,
             paddingBottom: 8,
             paddingTop: 8,
-            height: 60,
+            height: 70,
+            elevation: 8,
+            shadowColor: Colors.black,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+        },
+        tabBarIconStyle: {
+            marginBottom: 2,
+        },
+        tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '500' as const,
+            marginBottom: 4,
         },
     };
 
-    // Pharmacist tabs
+    // Pharmacist tabs - Inventory focused
     if (role === 'pharmacist') {
         return (
             <Tab.Navigator screenOptions={tabScreenOptions}>
@@ -41,24 +55,8 @@ export default function RoleTabs() {
                     name="HomeTab"
                     component={PharmacistHome}
                     options={{
-                        tabBarLabel: 'Pharmacy',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="local-pharmacy" color={color} size={size} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Batches"
-                    component={BatchesScreen}
-                    options={{
                         tabBarLabel: 'Inventory',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="inventory" color={color} size={size} />
-                    }}
-                />
-                <Tab.Screen
-                    name="History"
-                    component={HistoryScreen}
-                    options={{
-                        tabBarLabel: 'History',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="history" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="inventory" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen
@@ -66,14 +64,14 @@ export default function RoleTabs() {
                     component={ProfileScreen}
                     options={{
                         tabBarLabel: 'Profile',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="person" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
                     }}
                 />
             </Tab.Navigator>
         );
     }
 
-    // Manufacturer tabs
+    // Manufacturer tabs - My Batches focused
     if (role === 'manufacturer') {
         return (
             <Tab.Navigator screenOptions={tabScreenOptions}>
@@ -81,24 +79,8 @@ export default function RoleTabs() {
                     name="HomeTab"
                     component={ManufacturerHome}
                     options={{
-                        tabBarLabel: 'Production',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="factory" color={color} size={size} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Batches"
-                    component={BatchesScreen}
-                    options={{
-                        tabBarLabel: 'Batches',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="inventory" color={color} size={size} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Reports"
-                    component={ReportsScreen}
-                    options={{
-                        tabBarLabel: 'Reports',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="report" color={color} size={size} />
+                        tabBarLabel: 'My Batches',
+                        tabBarIcon: ({ color }) => <MaterialIcons name="inventory" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen
@@ -106,14 +88,14 @@ export default function RoleTabs() {
                     component={ProfileScreen}
                     options={{
                         tabBarLabel: 'Profile',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="person" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
                     }}
                 />
             </Tab.Navigator>
         );
     }
 
-    // Distributor tabs
+    // Distributor tabs - Verify & Transfer focused
     if (role === 'distributor') {
         return (
             <Tab.Navigator screenOptions={tabScreenOptions}>
@@ -121,24 +103,8 @@ export default function RoleTabs() {
                     name="HomeTab"
                     component={DistributorHome}
                     options={{
-                        tabBarLabel: 'Shipments',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="local-shipping" color={color} size={size} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Actions"
-                    component={ActionsScreen}
-                    options={{
-                        tabBarLabel: 'Actions',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="qr-code-scanner" color={color} size={size} />
-                    }}
-                />
-                <Tab.Screen
-                    name="History"
-                    component={HistoryScreen}
-                    options={{
-                        tabBarLabel: 'History',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="history" color={color} size={size} />
+                        tabBarLabel: 'Verify & Transfer',
+                        tabBarIcon: ({ color }) => <MaterialIcons name="verified" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen
@@ -146,7 +112,39 @@ export default function RoleTabs() {
                     component={ProfileScreen}
                     options={{
                         tabBarLabel: 'Profile',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="person" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
+                    }}
+                />
+            </Tab.Navigator>
+        );
+    }
+
+    // Admin tabs
+    if (role === 'admin') {
+        return (
+            <Tab.Navigator screenOptions={tabScreenOptions}>
+                <Tab.Screen
+                    name="HomeTab"
+                    component={RegulatorDashboard}
+                    options={{
+                        tabBarLabel: 'Dashboard',
+                        tabBarIcon: ({ color }) => <MaterialIcons name="dashboard" color={color} size={24} />
+                    }}
+                />
+                <Tab.Screen
+                    name="Reports"
+                    component={ReportsScreen}
+                    options={{
+                        tabBarLabel: 'Reports',
+                        tabBarIcon: ({ color }) => <MaterialIcons name="report" color={color} size={24} />
+                    }}
+                />
+                <Tab.Screen
+                    name="Profile"
+                    component={ProfileScreen}
+                    options={{
+                        tabBarLabel: 'Profile',
+                        tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
                     }}
                 />
             </Tab.Navigator>
@@ -162,7 +160,7 @@ export default function RoleTabs() {
                     component={RegulatorDashboard}
                     options={{
                         tabBarLabel: 'Dashboard',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="analytics" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="analytics" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen
@@ -170,7 +168,7 @@ export default function RoleTabs() {
                     component={BatchesScreen}
                     options={{
                         tabBarLabel: 'Batches',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="inventory" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="inventory" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen
@@ -178,7 +176,7 @@ export default function RoleTabs() {
                     component={ReportsScreen}
                     options={{
                         tabBarLabel: 'Reports',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="report" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="report" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen
@@ -186,7 +184,7 @@ export default function RoleTabs() {
                     component={ProfileScreen}
                     options={{
                         tabBarLabel: 'Profile',
-                        tabBarIcon: ({ color, size }) => <MaterialIcons name="person" color={color} size={size} />
+                        tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
                     }}
                 />
             </Tab.Navigator>
@@ -201,7 +199,7 @@ export default function RoleTabs() {
                 component={ConsumerHome}
                 options={{
                     tabBarLabel: 'Home',
-                    tabBarIcon: ({ color, size }) => <MaterialIcons name="home" color={color} size={size} />
+                    tabBarIcon: ({ color }) => <MaterialIcons name="home" color={color} size={24} />
                 }}
             />
             <Tab.Screen
@@ -209,7 +207,7 @@ export default function RoleTabs() {
                 component={ActionsScreen}
                 options={{
                     tabBarLabel: 'Actions',
-                    tabBarIcon: ({ color, size }) => <MaterialIcons name="qr-code-scanner" color={color} size={size} />
+                    tabBarIcon: ({ color }) => <MaterialIcons name="qr-code-scanner" color={color} size={24} />
                 }}
             />
             <Tab.Screen
@@ -217,7 +215,7 @@ export default function RoleTabs() {
                 component={HistoryScreen}
                 options={{
                     tabBarLabel: 'History',
-                    tabBarIcon: ({ color, size }) => <MaterialIcons name="history" color={color} size={size} />
+                    tabBarIcon: ({ color }) => <MaterialIcons name="history" color={color} size={24} />
                 }}
             />
             <Tab.Screen
@@ -225,7 +223,7 @@ export default function RoleTabs() {
                 component={ProfileScreen}
                 options={{
                     tabBarLabel: 'Profile',
-                    tabBarIcon: ({ color, size }) => <MaterialIcons name="person" color={color} size={size} />
+                    tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
                 }}
             />
         </Tab.Navigator>

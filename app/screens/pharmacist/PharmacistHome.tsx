@@ -1,297 +1,299 @@
 import { useRouter } from 'expo-router';
-import { AlertTriangle, Package, Pill, ScanLine, TrendingUp, Users } from 'lucide-react-native';
+import { Package, ScanLine } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, RoleColors } from '../../../constants/colors';
+import { Colors } from '../../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 export default function PharmacistHome() {
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { user } = useAuth();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
-  const handleScan = () => {
-    router.push('/scan' as any);
-  };
+  const primaryActions = [
+    {
+      id: 'scan-validate',
+      title: 'Scan & Validate',
+      description: 'Verify medicine authenticity and check expiry',
+      icon: ScanLine,
+      color: Colors.primary,
+      route: '/scan',
+    },
+    {
+      id: 'manage-inventory',
+      title: 'Manage Inventory',
+      description: 'Update stock levels and track batches',
+      icon: Package,
+      color: Colors.accent,
+      route: '/inventory',
+    },
+  ];
 
-  const handleInventory = () => {
-    router.push('/inventory' as any);
-  };
-
-  const handleDispense = () => {
-    router.push('/dispense' as any);
-  };
-
-  const handleUpdateStock = () => {
-    router.push('/update-stock' as any);
-  };
-
-  const handleShowQRReceipt = () => {
-    router.push('/qr-receipt' as any);
-  };
+  const inventoryItems = [
+    { id: 'I001', name: 'Paracetamol 500mg', stock: 150, status: 'In Stock', expiry: '2025-06-15' },
+    { id: 'I002', name: 'Amoxicillin 250mg', stock: 45, status: 'Low Stock', expiry: '2025-03-20' },
+    { id: 'I003', name: 'Ibuprofen 400mg', stock: 89, status: 'In Stock', expiry: '2025-08-10' },
+  ];
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+    <ScrollView 
+      style={[styles.container, { paddingTop: insets.top }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <Animated.View 
+        entering={FadeInDown.delay(100)}
+        style={styles.header}
+      >
         <View>
-          <Text style={styles.greeting}>Welcome back,</Text>
+          <Text style={styles.greeting}>Inventory</Text>
           <Text style={styles.userName}>{user?.name}</Text>
         </View>
-        <View style={[styles.roleBadge, { backgroundColor: RoleColors.pharmacist + '20' }]}>
-          <Text style={[styles.roleText, { color: RoleColors.pharmacist }]}>
-            PHARMACIST
-          </Text>
-        </View>
-      </View>
+      </Animated.View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <Animated.View 
+        entering={FadeInDown.delay(200)}
+        style={styles.statsContainer}
       >
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>284</Text>
+          <Text style={styles.statLabel}>Items in Stock</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>12</Text>
+          <Text style={styles.statLabel}>Low Stock</Text>
+        </View>
+      </Animated.View>
+
+      <Animated.View 
+        entering={FadeInDown.delay(300)}
+        style={styles.section}
+      >
+        <Text style={styles.sectionTitle}>Key Actions</Text>
         <View style={styles.actionsGrid}>
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: Colors.primary }]}
-            onPress={handleScan}
-            activeOpacity={0.9}
-          >
-            <ScanLine size={32} color={Colors.white} strokeWidth={2} />
-            <Text style={styles.actionTitle}>Scan & Verify</Text>
-            <Text style={styles.actionDescription}>Check authenticity & expiry</Text>
-          </TouchableOpacity>
+          {primaryActions.map((action, index) => {
+            const Icon = action.icon;
+            return (
+              <AnimatedTouchableOpacity
+                key={action.id}
+                entering={FadeInRight.delay(400 + index * 100)}
+                style={[styles.actionCard, { borderLeftColor: action.color }]}
+                onPress={() => router.push(action.route as any)}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: action.color + '20' }]}>
+                  <Icon size={24} color={action.color} />
+                </View>
+                <View style={styles.actionContent}>
+                  <Text style={styles.actionTitle}>{action.title}</Text>
+                  <Text style={styles.actionDescription}>{action.description}</Text>
+                </View>
+              </AnimatedTouchableOpacity>
+            );
+          })}
+        </View>
+      </Animated.View>
 
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: Colors.accent }]}
-            onPress={handleUpdateStock}
-            activeOpacity={0.9}
-          >
-            <Package size={32} color={Colors.white} strokeWidth={2} />
-            <Text style={styles.actionTitle}>Update Stock</Text>
-            <Text style={styles.actionDescription}>Track verified batches</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: Colors.primary }]}
-            onPress={handleDispense}
-            activeOpacity={0.9}
-          >
-            <Pill size={32} color={Colors.white} strokeWidth={2} />
-            <Text style={styles.actionTitle}>Record Sale/Use</Text>
-            <Text style={styles.actionDescription}>Mark batches as dispensed</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: Colors.accent }]}
-            onPress={handleShowQRReceipt}
-            activeOpacity={0.9}
-          >
-            <Package size={32} color={Colors.white} strokeWidth={2} />
-            <Text style={styles.actionTitle}>QR Receipt</Text>
-            <Text style={styles.actionDescription}>Show QR for customers</Text>
+      <Animated.View 
+        entering={FadeInDown.delay(600)}
+        style={styles.section}
+      >
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Current Inventory</Text>
+          <TouchableOpacity onPress={() => router.push('/inventory' as any)}>
+            <Text style={styles.seeAllText}>View All</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: Colors.primary + '15' }]}>
-              <Package size={24} color={Colors.primary} />
-            </View>
-            <Text style={styles.statValue}>1,247</Text>
-            <Text style={styles.statLabel}>Medicines Verified</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: Colors.accent + '15' }]}>
-              <AlertTriangle size={24} color={Colors.accent} />
-            </View>
-            <Text style={styles.statValue}>3</Text>
-            <Text style={styles.statLabel}>Suspicious Items</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: Colors.primary + '15' }]}>
-              <Users size={24} color={Colors.primary} />
-            </View>
-            <Text style={styles.statValue}>89</Text>
-            <Text style={styles.statLabel}>Patients Served</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: Colors.accent + '15' }]}>
-              <TrendingUp size={24} color={Colors.accent} />
-            </View>
-            <Text style={styles.statValue}>+12%</Text>
-            <Text style={styles.statLabel}>This Week</Text>
-          </View>
+        <View style={styles.inventoryList}>
+          {inventoryItems.map((item, index) => (
+            <Animated.View
+              key={item.id}
+              entering={FadeInRight.delay(700 + index * 100)}
+              style={styles.inventoryCard}
+            >
+              <View style={styles.inventoryInfo}>
+                <Text style={styles.inventoryId}>{item.id}</Text>
+                <Text style={styles.inventoryName}>{item.name}</Text>
+                <Text style={styles.inventoryDetails}>Stock: {item.stock} | Exp: {item.expiry}</Text>
+              </View>
+              <View style={[
+                styles.statusBadge,
+                { backgroundColor: getStockStatusColor(item.status) + '20' }
+              ]}>
+                <Text style={[
+                  styles.statusText,
+                  { color: getStockStatusColor(item.status) }
+                ]}>
+                  {item.status}
+                </Text>
+              </View>
+            </Animated.View>
+          ))}
         </View>
-
-        <View style={styles.infoCard}>
-          <Package size={32} color={Colors.primary} />
-          <Text style={styles.infoTitle}>Pharmacy Safety Standards</Text>
-          <Text style={styles.infoDescription}>
-            Always verify medicine authenticity before dispensing to ensure patient safety and regulatory compliance.
-          </Text>
-        </View>
-      </ScrollView>
-    </View>
+      </Animated.View>
+    </ScrollView>
   );
+}
+
+function getStockStatusColor(status: string) {
+  switch (status) {
+    case 'In Stock': return Colors.success;
+    case 'Low Stock': return Colors.warning;
+    case 'Out of Stock': return Colors.error;
+    default: return Colors.textSecondary;
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: Colors.white,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   greeting: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 2,
+    fontSize: 20,
+    fontWeight: '600' as const,
+    color: Colors.primary,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: Colors.text,
-    flexShrink: 1,
-    maxWidth: '80%',
-  },
-  roleText: {
-    fontSize: 9,
-    fontWeight: '700' as const,
-  },
-  roleBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    maxWidth: 90,
-    alignItems: 'center',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 20,
-  },
-  actionsGrid: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    marginBottom: 24,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  actionCard: {
-    flex: 1,
-    minWidth: '30%',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  actionTitle: {
     fontSize: 16,
-    fontWeight: '700' as const,
-    color: Colors.white,
-    marginTop: 12,
-    marginBottom: 4,
-    textAlign: 'center',
+    color: Colors.textSecondary,
+    marginTop: 4,
   },
-  actionDescription: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-  },
-  statsGrid: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
+  statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    marginBottom: 24,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    paddingHorizontal: 24,
+    marginBottom: 32,
+    gap: 12,
   },
   statCard: {
     flex: 1,
-    minWidth: '47%',
-    backgroundColor: Colors.backgroundSecondary,
+    backgroundColor: Colors.white,
+    padding: 20,
     borderRadius: 16,
-    padding: 16,
     alignItems: 'center',
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  statIcon: {
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: Colors.primary,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  section: {
+    paddingHorizontal: 24,
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  seeAllText: {
+    fontSize: 14,
+    color: Colors.accent,
+    fontWeight: '600' as const,
+  },
+  actionsGrid: {
+    gap: 12,
+  },
+  actionCard: {
+    backgroundColor: Colors.white,
+    padding: 20,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  actionIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginRight: 16,
   },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: Colors.text,
+  actionContent: {
+    flex: 1,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: Colors.primary,
     marginBottom: 4,
   },
-  statLabel: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-  infoCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 24,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.primary + '20',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  infoTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: Colors.primary,
-    marginTop: 12,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  infoDescription: {
+  actionDescription: {
     fontSize: 14,
     color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
+  },
+  inventoryList: {
+    gap: 12,
+  },
+  inventoryCard: {
+    backgroundColor: Colors.white,
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  inventoryInfo: {
+    flex: 1,
+  },
+  inventoryId: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.primary,
+  },
+  inventoryName: {
+    fontSize: 16,
+    color: Colors.text,
+    marginTop: 2,
+  },
+  inventoryDetails: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
   },
 });

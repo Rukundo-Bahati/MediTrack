@@ -2,7 +2,7 @@ import { verifyQR } from '@/utils/mockApi';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Button, Text, useTheme } from 'react-native-paper';
 
 export default function ScanScreen() {
@@ -61,9 +61,21 @@ export default function ScanScreen() {
         {!loading && (
           <View style={styles.overlay}>
             <Text style={styles.instructionText}>Point camera at QR code</Text>
+            <Text style={styles.subInstructionText}>Scan to verify medicine authenticity</Text>
             <View style={styles.scannerFrame} />
+            
+            {/* Report Suspicious Button */}
+            <TouchableOpacity
+              style={styles.reportButton}
+              onPress={() => router.push('/report-suspicious' as any)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.reportButtonText}>Report Suspicious Medicine</Text>
+            </TouchableOpacity>
           </View>
         )}
+        
+
       </CameraView>
     </SafeAreaView>
   );
@@ -80,10 +92,18 @@ const styles = StyleSheet.create({
   instructionText: {
     color: '#fff',
     fontSize: 18,
-    marginBottom: 20,
+    fontWeight: '600',
     textAlign: 'center',
     position: 'absolute',
-    top: 40,
+    top: 60,
+  },
+  subInstructionText: {
+    color: '#fff',
+    fontSize: 14,
+    textAlign: 'center',
+    position: 'absolute',
+    top: 90,
+    opacity: 0.8,
   },
   scannerFrame: {
     width: 250,
@@ -91,6 +111,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 3,
     borderColor: '#fc7f03',
+  },
+  reportButton: {
+    position: 'absolute',
+    bottom: 120,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(252, 127, 3, 0.9)',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  reportButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   loadingOverlay: {
     flex: 1,
@@ -116,4 +152,5 @@ const styles = StyleSheet.create({
   permissionButton: {
     marginTop: 12,
   },
+
 });

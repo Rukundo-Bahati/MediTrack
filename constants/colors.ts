@@ -38,5 +38,6 @@ export const RoleColors = {
   distributor: '#fc7f03', // Primary orange - logistics and movement
   manufacturer: '#f56a20', // Secondary orange - production
   regulator: '#fc7f03',   // Primary orange - oversight and monitoring
+  admin: '#6366F1',       // Indigo - administrative oversight
   guest: '#64748B',       // Gray - neutral
 };

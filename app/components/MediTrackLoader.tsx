@@ -2,16 +2,16 @@ import { Package, Scan, Shield } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
-    Easing,
-    FadeIn,
-    interpolate,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withSequence,
-    withTiming,
-    ZoomIn
+  Easing,
+  FadeIn,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+  ZoomIn
 } from 'react-native-reanimated';
 import { Colors } from '../../constants/colors';
 

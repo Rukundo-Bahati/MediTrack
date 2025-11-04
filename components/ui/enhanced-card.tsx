@@ -16,7 +16,7 @@ export function EnhancedCard({
   style,
 }: EnhancedCardProps) {
   const getCardStyle = () => {
-    const baseStyle = [styles.card, styles[padding]];
+    const baseStyle: any[] = [styles.card, styles[padding]];
     
     switch (variant) {
       case 'elevated':

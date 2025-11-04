@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-export type UserRole = 'consumer' | 'pharmacist' | 'distributor' | 'manufacturer' | 'regulator' | 'guest';
+export type UserRole = 'consumer' | 'pharmacist' | 'distributor' | 'manufacturer' | 'regulator' | 'admin' | 'guest';
 
 type User = {
   id: string;
@@ -9,12 +9,27 @@ type User = {
   email?: string;
   role: UserRole;
   token?: string; // mock JWT
+  companyName?: string;
+  licenseNumber?: string;
+  businessId?: string;
+  region?: string;
+  facilityName?: string;
+  location?: string;
 };
 
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
-  login: (role: UserRole, opts?: { name?: string; email?: string }) => Promise<void>;
+  login: (role: UserRole, opts?: { 
+    name?: string; 
+    email?: string; 
+    companyName?: string;
+    licenseNumber?: string;
+    businessId?: string;
+    region?: string;
+    facilityName?: string;
+    location?: string;
+  }) => Promise<void>;
   logout: () => Promise<void>;
   setRole: (role: UserRole) => void;
   completeOnboarding: () => Promise<void>;
@@ -47,7 +62,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
-  const login = async (role: UserRole, opts?: { name?: string; email?: string }) => {
+  const login = async (role: UserRole, opts?: { 
+    name?: string; 
+    email?: string; 
+    companyName?: string;
+    licenseNumber?: string;
+    businessId?: string;
+    region?: string;
+    facilityName?: string;
+    location?: string;
+  }) => {
     setLoading(true);
     // mock JWT and user id
     const newUser: User = {
@@ -56,6 +80,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: opts?.email,
       role,
       token: 'mock-jwt-token',
+      companyName: opts?.companyName,
+      licenseNumber: opts?.licenseNumber,
+      businessId: opts?.businessId,
+      region: opts?.region,
+      facilityName: opts?.facilityName,
+      location: opts?.location,
     };
     await AsyncStorage.setItem('medi_user', JSON.stringify(newUser));
     setUser(newUser);

@@ -24,7 +24,7 @@ export function EnhancedButton({
   textStyle,
 }: EnhancedButtonProps) {
   const getButtonStyle = () => {
-    const baseStyle = [styles.button, styles[size]];
+    const baseStyle: any[] = [styles.button, styles[size]];
     
     switch (variant) {
       case 'primary':
@@ -46,7 +46,7 @@ export function EnhancedButton({
   };
 
   const getTextStyle = () => {
-    const baseStyle = [styles.text, styles[`${size}Text`]];
+    const baseStyle: any[] = [styles.text, styles[`${size}Text`]];
     
     switch (variant) {
       case 'primary':

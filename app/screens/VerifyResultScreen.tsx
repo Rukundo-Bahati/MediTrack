@@ -1,11 +1,11 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AlertTriangle, CheckCircle2, Clock, MapPin, Package, X, XCircle } from 'lucide-react-native';
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
@@ -188,7 +188,7 @@ export default function VerificationScreen() {
                         styles.logDot,
                         { backgroundColor: log.status === 'received' ? Colors.accent : Colors.primary }
                       ]} />
-                      {index < result.provenance.length - 1 && (
+                      {index < (result.provenance?.length || 0) - 1 && (
                         <View style={styles.logConnector} />
                       )}
                     </View>
