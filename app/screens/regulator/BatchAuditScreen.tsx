@@ -1,12 +1,13 @@
 import { useRouter } from 'expo-router';
-import { AlertTriangle, ArrowLeft, Calendar, CheckCircle, Package, Search, XCircle } from 'lucide-react-native';
+import { AlertTriangle, Calendar, CheckCircle, Package, XCircle } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown, FadeInUp, SlideInRight } from 'react-native-reanimated';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInUp, SlideInRight } from 'react-native-reanimated';
 import { ModernButton } from '../../../components/ui/modern-button';
 import { ModernCard } from '../../../components/ui/modern-card';
 import { ModernInput } from '../../../components/ui/modern-input';
 import { ScreenLayout } from '../../../components/ui/modern-layout';
+import { ModernNavbar } from '../../../components/ui/modern-navbar';
 import { Colors } from '../../../constants/colors';
 import { Shadows } from '../../../constants/shadows';
 import { Spacing } from '../../../constants/spacing';
@@ -106,42 +107,19 @@ export default function BatchAuditScreen() {
   };
 
   return (
-    <ScreenLayout scrollable style={styles.container}>
-      {/* Back Button */}
-      <Animated.View
-        entering={FadeInDown.delay(100)}
-        style={styles.backButtonContainer}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/(tabs)');
-            }
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Header */}
-      <Animated.View
-        entering={FadeInDown.delay(200)}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.headerIcon}>
-            <Search size={32} color={Colors.primary} strokeWidth={2} />
-          </View>
-          <Text style={styles.title}>Batch Audit</Text>
-          <Text style={styles.subtitle}>
-            Search and audit blockchain batch events
-          </Text>
-        </View>
-      </Animated.View>
+    <View style={styles.container}>
+      <ModernNavbar 
+        title="Batch Audit" 
+        showBackButton={true}
+        onBackPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)');
+          }
+        }}
+      />
+      <ScreenLayout scrollable style={styles.scrollContainer}>
 
       {/* Search Section */}
       <Animated.View
@@ -253,13 +231,19 @@ export default function BatchAuditScreen() {
           </ModernCard>
         </Animated.View>
       )}
-    </ScreenLayout>
+      </ScreenLayout>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: Spacing.lg,
   },
 
   // Back Button Styles

@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { AlertTriangle, BarChart3, CheckCircle, Factory, Package, QrCode, ScanLine, Truck } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ModernNavbar } from '../../components/ui/modern-navbar';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../context/AuthContext';
 
@@ -58,10 +59,7 @@ export default function ActionsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.title}>Quick Actions</Text>
-        <Text style={styles.subtitle}>Role: {user?.role?.toUpperCase()}</Text>
-      </View>
+      <ModernNavbar title={`Quick Actions - ${user?.role?.toUpperCase()}`} />
 
       <ScrollView 
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
@@ -103,28 +101,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.backgroundSecondary,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: Colors.white,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: Colors.primary,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: Colors.textSecondary,
   },
   scrollContent: {
     paddingHorizontal: 20,

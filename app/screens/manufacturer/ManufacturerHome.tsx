@@ -1,9 +1,9 @@
+import { ModernNavbar } from '@/components/ui';
 import { useRouter } from 'expo-router';
 import {
-    Factory,
-    Package,
-    Plus,
-    TrendingUp
+  Package,
+  Plus,
+  TrendingUp
 } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
@@ -49,127 +49,122 @@ export default function ManufacturerHome() {
   ];
 
   return (
-    <ScreenLayout scrollable style={styles.container}>
-      {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.delay(100)}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.headerIcon}>
-            <Factory size={32} color={Colors.primary} strokeWidth={2} />
-          </View>
-          <Text style={styles.greeting}>Medicine Production</Text>
-          <Text style={styles.userName}>Welcome back, {user?.name}</Text>
-        </View>
-      </Animated.View>
+    <View style={styles.container}>
+      <ModernNavbar title="Manufacturing Dashboard" />
+      <ScreenLayout scrollable style={styles.scrollContainer}>
 
-      {/* Stats */}
-      <Animated.View 
-        entering={FadeInDown.delay(200)}
-        style={styles.statsContainer}
-      >
-        <Animated.View entering={SlideInRight.delay(300)}>
-          <ModernCard variant="elevated" style={styles.statCard}>
-            <TrendingUp size={24} color={Colors.primary} />
-            <Text style={styles.statNumber}>24</Text>
-            <Text style={styles.statLabel}>Active Batches</Text>
-          </ModernCard>
+        {/* Stats */}
+        <Animated.View
+          entering={FadeInDown.delay(200)}
+          style={styles.statsContainer}
+        >
+          <Animated.View entering={SlideInRight.delay(300)}>
+            <ModernCard variant="elevated" style={styles.statCard}>
+              <TrendingUp size={24} color={Colors.primary} />
+              <Text style={styles.statNumber}>24</Text>
+              <Text style={styles.statLabel}>Active Batches</Text>
+            </ModernCard>
+          </Animated.View>
+          <Animated.View entering={SlideInRight.delay(400)}>
+            <ModernCard variant="elevated" style={styles.statCard}>
+              <Package size={24} color={Colors.accent} />
+              <Text style={[styles.statNumber, { color: Colors.accent }]}>156</Text>
+              <Text style={styles.statLabel}>Total Produced</Text>
+            </ModernCard>
+          </Animated.View>
         </Animated.View>
-        <Animated.View entering={SlideInRight.delay(400)}>
-          <ModernCard variant="elevated" style={styles.statCard}>
-            <Package size={24} color={Colors.accent} />
-            <Text style={[styles.statNumber, { color: Colors.accent }]}>156</Text>
-            <Text style={styles.statLabel}>Total Produced</Text>
-          </ModernCard>
-        </Animated.View>
-      </Animated.View>
 
-      {/* Key Actions */}
-      <Animated.View 
-        entering={FadeInDown.delay(500)}
-        style={styles.section}
-      >
-        <Text style={styles.sectionTitle}>Key Actions</Text>
-        <View style={styles.actionsGrid}>
-          {primaryActions.map((action, index) => {
-            const Icon = action.icon;
-            return (
-              <Animated.View
-                key={action.id}
-                entering={SlideInRight.delay(600 + index * 100)}
-              >
-                <TouchableOpacity
-                  onPress={() => router.push(action.route as any)}
-                  activeOpacity={0.7}
+        {/* Key Actions */}
+        <Animated.View
+          entering={FadeInDown.delay(500)}
+          style={styles.section}
+        >
+          <Text style={styles.sectionTitle}>Key Actions</Text>
+          <View style={styles.actionsGrid}>
+            {primaryActions.map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <Animated.View
+                  key={action.id}
+                  entering={SlideInRight.delay(600 + index * 100)}
                 >
-                  <ModernCard variant="elevated" style={styles.actionCard}>
-                    <View style={[styles.actionIcon, { backgroundColor: action.color + '15' }]}>
-                      <Icon size={28} color={action.color} strokeWidth={2} />
-                    </View>
-                    <View style={styles.actionContent}>
-                      <Text style={styles.actionTitle}>{action.title}</Text>
-                      <Text style={styles.actionDescription}>{action.description}</Text>
-                    </View>
-                  </ModernCard>
-                </TouchableOpacity>
-              </Animated.View>
-            );
-          })}
-        </View>
-      </Animated.View>
+                  <TouchableOpacity
+                    onPress={() => router.push(action.route as any)}
+                    activeOpacity={0.7}
+                  >
+                    <ModernCard variant="elevated" style={styles.actionCard}>
+                      <View style={[styles.actionIcon, { backgroundColor: action.color + '15' }]}>
+                        <Icon size={28} color={action.color} strokeWidth={2} />
+                      </View>
+                      <View style={styles.actionContent}>
+                        <Text style={styles.actionTitle}>{action.title}</Text>
+                        <Text style={styles.actionDescription}>{action.description}</Text>
+                      </View>
+                    </ModernCard>
+                  </TouchableOpacity>
+                </Animated.View>
+              );
+            })}
+          </View>
+        </Animated.View>
 
-      {/* Recent Batches */}
-      <Animated.View 
-        entering={FadeInDown.delay(800)}
-        style={styles.section}
-      >
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Batches</Text>
-          <TouchableOpacity onPress={() => router.push('/batches' as any)}>
-            <Text style={styles.seeAllText}>View All</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.batchesList}>
-          {recentBatches.map((batch, index) => (
-            <Animated.View
-              key={batch.id}
-              entering={SlideInRight.delay(900 + index * 100)}
-            >
-              <ModernCard variant="elevated" style={styles.batchCard}>
-                <View style={styles.batchHeader}>
-                  <View style={styles.batchIcon}>
-                    <Package size={20} color={Colors.primary} />
-                  </View>
-                  <View style={styles.batchInfo}>
-                    <Text style={styles.batchName}>{batch.name}</Text>
-                    <Text style={styles.batchId}>Batch {batch.id}</Text>
-                    <Text style={styles.batchDate}>{batch.date}</Text>
-                  </View>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: batch.status === 'Active' ? Colors.accent + '20' : Colors.warning + '20' }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: batch.status === 'Active' ? Colors.accent : Colors.warning }
+        {/* Recent Batches */}
+        <Animated.View
+          entering={FadeInDown.delay(800)}
+          style={styles.section}
+        >
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Batches</Text>
+            <TouchableOpacity onPress={() => router.push('/batches' as any)}>
+              <Text style={styles.seeAllText}>View All</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.batchesList}>
+            {recentBatches.map((batch, index) => (
+              <Animated.View
+                key={batch.id}
+                entering={SlideInRight.delay(900 + index * 100)}
+              >
+                <ModernCard variant="elevated" style={styles.batchCard}>
+                  <View style={styles.batchHeader}>
+                    <View style={styles.batchIcon}>
+                      <Package size={20} color={Colors.primary} />
+                    </View>
+                    <View style={styles.batchInfo}>
+                      <Text style={styles.batchName}>{batch.name}</Text>
+                      <Text style={styles.batchId}>Batch {batch.id}</Text>
+                      <Text style={styles.batchDate}>{batch.date}</Text>
+                    </View>
+                    <View style={[
+                      styles.statusBadge,
+                      { backgroundColor: batch.status === 'Active' ? Colors.accent + '20' : Colors.warning + '20' }
                     ]}>
-                      {batch.status.toUpperCase()}
-                    </Text>
+                      <Text style={[
+                        styles.statusText,
+                        { color: batch.status === 'Active' ? Colors.accent : Colors.warning }
+                      ]}>
+                        {batch.status.toUpperCase()}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </ModernCard>
-            </Animated.View>
-          ))}
-        </View>
-      </Animated.View>
-    </ScreenLayout>
+                </ModernCard>
+              </Animated.View>
+            ))}
+          </View>
+        </Animated.View>
+      </ScreenLayout>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: Spacing.lg,
   },
 
   // Header Styles

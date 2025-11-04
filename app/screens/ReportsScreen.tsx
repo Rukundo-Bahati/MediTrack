@@ -1,20 +1,31 @@
+import { useRouter } from 'expo-router';
 import { AlertTriangle, FileText } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ModernNavbar } from '../../components/ui/modern-navbar';
 import { Colors } from '../../constants/colors';
 import { getAllReports } from '../services/blockchainService';
 
 export default function ReportsScreen() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const reports = getAllReports();
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.title}>Reports</Text>
-      </View>
+      <ModernNavbar 
+        title="Reports" 
+        showBackButton={true}
+        onBackPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)');
+          }
+        }}
+      />
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
         showsVerticalScrollIndicator={false}
       >
@@ -61,19 +72,7 @@ export default function ReportsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: Colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: Colors.text,
+    backgroundColor: Colors.backgroundSecondary,
   },
   scrollContent: {
     paddingHorizontal: 20,

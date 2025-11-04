@@ -269,6 +269,7 @@ export default function BatchesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
   },
 
   // Back Button Styles

@@ -30,8 +30,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({
       case 'screen':
         return {
           ...baseStyle,
-          backgroundColor: Colors.background,
-          paddingTop: insets.top,
+          backgroundColor: Colors.backgroundSecondary,
           paddingBottom: insets.bottom,
           paddingHorizontal: padding ? Spacing.layout.screen : 0,
         };

@@ -4,7 +4,6 @@ import React from 'react';
 import { Colors } from '../../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import ActionsScreen from '../screens/ActionScreen';
-import BatchesScreen from '../screens/BatchesScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ReportsScreen from '../screens/ReportsScreen';
@@ -161,14 +160,6 @@ export default function RoleTabs() {
                     options={{
                         tabBarLabel: 'Dashboard',
                         tabBarIcon: ({ color }) => <MaterialIcons name="analytics" color={color} size={24} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Batches"
-                    component={BatchesScreen}
-                    options={{
-                        tabBarLabel: 'Batches',
-                        tabBarIcon: ({ color }) => <MaterialIcons name="inventory" color={color} size={24} />
                     }}
                 />
                 <Tab.Screen

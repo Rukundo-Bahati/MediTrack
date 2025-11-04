@@ -1,10 +1,10 @@
+import { ModernNavbar } from '@/components/ui';
 import { useRouter } from 'expo-router';
 import {
   AlertTriangle,
   History as HistoryIcon,
   Package,
-  ScanLine,
-  Shield
+  ScanLine
 } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
@@ -50,20 +50,9 @@ export default function PharmacistHome() {
   ];
 
   return (
-    <ScreenLayout scrollable style={styles.container}>
-      {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.delay(100)}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.headerIcon}>
-            <Shield size={32} color={Colors.primary} strokeWidth={2} />
-          </View>
-          <Text style={styles.greeting}>Medicine Verification</Text>
-          <Text style={styles.userName}>Welcome back, {user?.name}</Text>
-        </View>
-      </Animated.View>
+    <View style={styles.container}>
+      <ModernNavbar title="Pharmacy Dashboard" />
+      <ScreenLayout scrollable style={styles.scrollContainer}>
 
       {/* Stats */}
       <Animated.View 
@@ -164,7 +153,8 @@ export default function PharmacistHome() {
           ))}
         </View>
       </Animated.View>
-    </ScreenLayout>
+      </ScreenLayout>
+    </View>
   );
 }
 
@@ -180,6 +170,11 @@ function getStockStatusColor(status: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: Spacing.lg,
   },
 
   // Header Styles

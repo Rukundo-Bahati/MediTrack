@@ -11,6 +11,7 @@ import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModernCard } from '../../../components/ui/modern-card';
 import { ScreenLayout } from '../../../components/ui/modern-layout';
+import { ModernNavbar } from '../../../components/ui/modern-navbar';
 import { Colors } from '../../../constants/colors';
 import { Shadows } from '../../../constants/shadows';
 import { Spacing } from '../../../constants/spacing';
@@ -50,20 +51,9 @@ export default function DistributorHome() {
   ];
 
   return (
-    <ScreenLayout scrollable style={styles.container}>
-      {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.delay(100)}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.headerIcon}>
-            <Truck size={32} color={Colors.primary} strokeWidth={2} />
-          </View>
-          <Text style={styles.greeting}>Supply Chain Hub</Text>
-          <Text style={styles.userName}>Welcome back, {user?.name}</Text>
-        </View>
-      </Animated.View>
+    <View style={styles.container}>
+      <ModernNavbar title="Distribution Dashboard" />
+      <ScreenLayout scrollable style={styles.scrollContainer}>
 
       {/* Stats */}
       <Animated.View 
@@ -164,7 +154,8 @@ export default function DistributorHome() {
           ))}
         </View>
       </Animated.View>
-    </ScreenLayout>
+      </ScreenLayout>
+    </View>
   );
 }
 
@@ -180,6 +171,11 @@ function getStatusColor(status: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: Spacing.lg,
   },
 
   // Header Styles

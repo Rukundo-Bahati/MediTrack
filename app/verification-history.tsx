@@ -1,3 +1,4 @@
-import VerificationHistoryScreen from './screens/VerificationHistoryScreen';
+import VerificationHistoryScreen from "./screens/VerificationHistoryScreen";
+
 
 export default VerificationHistoryScreen;

@@ -1,10 +1,10 @@
 export const Colors = {
   // Primary colors - orange theme
-  primary: '#fc7f03',     // Primary orange
-  accent: '#f56a20',      // Secondary orange  
-  danger: '#EF4444',      // Vibrant red
-  warning: '#F59E0B',     // Vibrant amber
-  info: '#fc7f03',       // Orange theme
+  primary: '#fc7f03',
+  accent: '#f56a20',
+  danger: '#EF4444',
+  warning: '#F59E0B',
+  info: '#fc7f03',
 
   // Background colors
   background: '#FFFFFF',
@@ -27,17 +27,17 @@ export const Colors = {
   error: '#EF4444',
 
   // Additional colors for UI variety while maintaining orange theme
-  indigo: '#6366F1',    // Indigo for secondary actions
-  teal: '#14B8A6',      // Teal for tertiary actions (complements orange)
-  orange: '#FF9800',    // Orange for borders
+  indigo: '#6366F1',   
+  teal: '#14B8A6',    
+  orange: '#FF9800',    
 };
 
 export const RoleColors = {
-  consumer: '#fc7f03',    // Orange - primary brand color
-  pharmacist: '#f56a20',  // Secondary orange - health and safety
-  distributor: '#fc7f03', // Primary orange - logistics and movement
-  manufacturer: '#f56a20', // Secondary orange - production
-  regulator: '#fc7f03',   // Primary orange - oversight and monitoring
-  admin: '#6366F1',       // Indigo - administrative oversight
-  guest: '#64748B',       // Gray - neutral
+  consumer: '#fc7f03',
+  pharmacist: '#f56a20',
+  distributor: '#fc7f03',
+  manufacturer: '#f56a20',
+  regulator: '#fc7f03',
+  admin: '#6366F1',
+  guest: '#64748B',
 };

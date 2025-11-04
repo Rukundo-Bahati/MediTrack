@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { AlertTriangle, CheckCircle2, Clock, MapPin, Package, X, XCircle } from 'lucide-react-native';
+import { AlertTriangle, CheckCircle2, Clock, MapPin, Package, XCircle } from 'lucide-react-native';
 import {
     ScrollView,
     StyleSheet,
@@ -8,6 +8,7 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ModernNavbar } from '../../components/ui/modern-navbar';
 import { Colors } from '../../constants/colors';
 
 interface VerificationResult {
@@ -48,7 +49,12 @@ export default function VerificationScreen() {
   if (!result) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        <ModernNavbar 
+          title="Verification Result" 
+          showBackButton={true}
+          onBackPress={() => router.back()}
+        />
+        <View style={styles.errorContainer}>
           <Text style={styles.errorText}>No verification data available</Text>
           <TouchableOpacity style={styles.button} onPress={() => router.back()}>
             <Text style={styles.buttonText}>Go Back</Text>
@@ -63,11 +69,11 @@ export default function VerificationScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
-          <X size={24} color={Colors.text} />
-        </TouchableOpacity>
-      </View>
+      <ModernNavbar 
+        title="Verification Result" 
+        showBackButton={true}
+        onBackPress={() => router.back()}
+      />
 
       <ScrollView 
         style={styles.scrollView}
@@ -253,22 +259,13 @@ export default function VerificationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    backgroundColor: Colors.background,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     backgroundColor: Colors.backgroundSecondary,
+  },
+  errorContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   scrollView: {
     flex: 1,

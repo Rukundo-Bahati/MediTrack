@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { AlertTriangle, ArrowLeft, Camera } from 'lucide-react-native';
+import { AlertTriangle, Camera } from 'lucide-react-native';
 import { useState } from 'react';
 import {
     Alert,
@@ -13,6 +13,7 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ModernNavbar } from '../../components/ui/modern-navbar';
 import { Colors } from '../../constants/colors';
 
 export default function ReportSuspiciousScreen() {
@@ -48,34 +49,30 @@ export default function ReportSuspiciousScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView 
-        contentContainerStyle={[
-          styles.scrollContent, 
-          { 
-            paddingTop: insets.top + 20, 
-            paddingBottom: insets.bottom + 20 
-          }
-        ]}
-        showsVerticalScrollIndicator={false}
+    <View style={styles.container}>
+      <ModernNavbar 
+        title="Report Suspicious Medicine" 
+        showBackButton={true}
+        onBackPress={() => router.back()}
+      />
+      <KeyboardAvoidingView 
+        style={styles.keyboardContainer} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft size={24} color={Colors.primary} />
-          </TouchableOpacity>
-          <View style={styles.iconContainer}>
-            <AlertTriangle size={32} color={Colors.danger} strokeWidth={2} />
+        <ScrollView 
+          contentContainerStyle={[
+            styles.scrollContent, 
+            { paddingBottom: insets.bottom + 20 }
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header Info */}
+          <View style={styles.header}>
+            <View style={styles.iconContainer}>
+              <AlertTriangle size={32} color={Colors.danger} strokeWidth={2} />
+            </View>
+            <Text style={styles.subtitle}>Help protect others by reporting counterfeit drugs</Text>
           </View>
-          <Text style={styles.title}>Report Suspicious Medicine</Text>
-          <Text style={styles.subtitle}>Help protect others by reporting counterfeit drugs</Text>
-        </View>
 
         <View style={styles.form}>
           {/* Warning Banner */}
@@ -158,30 +155,28 @@ export default function ReportSuspiciousScreen() {
             Your report will be sent to relevant authorities. All reports are treated confidentially.
           </Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  keyboardContainer: {
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
+    paddingTop: 20,
   },
   header: {
     alignItems: 'center',
     marginBottom: 32,
-    position: 'relative',
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    padding: 8,
   },
   iconContainer: {
     width: 64,
@@ -191,13 +186,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: Colors.primary,
-    marginBottom: 8,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,

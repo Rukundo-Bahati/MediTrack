@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
-import { AlertTriangle, CheckCircle, FileText, Shield, TrendingUp } from 'lucide-react-native';
+import { AlertTriangle, CheckCircle, FileText, TrendingUp } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModernCard } from '../../../components/ui/modern-card';
 import { ScreenLayout } from '../../../components/ui/modern-layout';
+import { ModernNavbar } from '../../../components/ui/modern-navbar';
 import { Colors } from '../../../constants/colors';
 import { Shadows } from '../../../constants/shadows';
 import { Spacing } from '../../../constants/spacing';
@@ -68,123 +69,111 @@ export default function RegulatorDashboard() {
   ];
 
   return (
-    <ScreenLayout scrollable style={styles.container}>
-      {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.delay(100)}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.headerIcon}>
-            <Shield size={32} color={Colors.primary} strokeWidth={2} />
-          </View>
-          <Text style={styles.greeting}>
-            {isAdmin ? 'Admin Dashboard' : 'Regulatory Oversight'}
-          </Text>
-          <Text style={styles.userName}>Welcome back, {user?.name}</Text>
-        </View>
-      </Animated.View>
+    <View style={styles.container}>
+      <ModernNavbar title={isAdmin ? 'Admin Dashboard' : 'Regulatory Dashboard'} />
+      <ScreenLayout scrollable style={styles.scrollContainer}>
 
-      {/* Stats */}
-      <Animated.View 
-        entering={FadeInDown.delay(200)}
-        style={styles.statsContainer}
-      >
-        <Animated.View entering={SlideInRight.delay(300)}>
-          <ModernCard variant="elevated" style={styles.statCard}>
-            <AlertTriangle size={24} color={Colors.primary} />
-            <Text style={styles.statNumber}>{isAdmin ? '15' : '23'}</Text>
-            <Text style={styles.statLabel}>{isAdmin ? 'Pending Approvals' : 'Reports This Week'}</Text>
-          </ModernCard>
+        {/* Stats */}
+        <Animated.View
+          entering={FadeInDown.delay(200)}
+          style={styles.statsContainer}
+        >
+          <Animated.View entering={SlideInRight.delay(300)}>
+            <ModernCard variant="elevated" style={styles.statCard}>
+              <AlertTriangle size={24} color={Colors.primary} />
+              <Text style={styles.statNumber}>{isAdmin ? '15' : '23'}</Text>
+              <Text style={styles.statLabel}>{isAdmin ? 'Pending Approvals' : 'Reports This Week'}</Text>
+            </ModernCard>
+          </Animated.View>
+          <Animated.View entering={SlideInRight.delay(400)}>
+            <ModernCard variant="elevated" style={styles.statCard}>
+              <TrendingUp size={24} color={Colors.accent} />
+              <Text style={[styles.statNumber, { color: Colors.accent }]}>{isAdmin ? '8' : '95.3%'}</Text>
+              <Text style={styles.statLabel}>{isAdmin ? 'Active Reports' : 'Compliance Rate'}</Text>
+            </ModernCard>
+          </Animated.View>
         </Animated.View>
-        <Animated.View entering={SlideInRight.delay(400)}>
-          <ModernCard variant="elevated" style={styles.statCard}>
-            <TrendingUp size={24} color={Colors.accent} />
-            <Text style={[styles.statNumber, { color: Colors.accent }]}>{isAdmin ? '8' : '95.3%'}</Text>
-            <Text style={styles.statLabel}>{isAdmin ? 'Active Reports' : 'Compliance Rate'}</Text>
-          </ModernCard>
-        </Animated.View>
-      </Animated.View>
 
-      {/* Key Actions */}
-      <Animated.View 
-        entering={FadeInDown.delay(500)}
-        style={styles.section}
-      >
-        <Text style={styles.sectionTitle}>Key Actions</Text>
-        <View style={styles.actionsGrid}>
-          {primaryActions.map((action, index) => {
-            const Icon = action.icon;
-            return (
-              <Animated.View
-                key={action.id}
-                entering={SlideInRight.delay(600 + index * 100)}
-              >
-                <TouchableOpacity
-                  onPress={() => router.push(action.route as any)}
-                  activeOpacity={0.7}
+        {/* Key Actions */}
+        <Animated.View
+          entering={FadeInDown.delay(500)}
+          style={styles.section}
+        >
+          <Text style={styles.sectionTitle}>Key Actions</Text>
+          <View style={styles.actionsGrid}>
+            {primaryActions.map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <Animated.View
+                  key={action.id}
+                  entering={SlideInRight.delay(600 + index * 100)}
                 >
-                  <ModernCard variant="elevated" style={styles.actionCard}>
-                    <View style={[styles.actionIcon, { backgroundColor: action.color + '15' }]}>
-                      <Icon size={28} color={action.color} strokeWidth={2} />
-                    </View>
-                    <View style={styles.actionContent}>
-                      <Text style={styles.actionTitle}>{action.title}</Text>
-                      <Text style={styles.actionDescription}>{action.description}</Text>
-                    </View>
-                  </ModernCard>
-                </TouchableOpacity>
-              </Animated.View>
-            );
-          })}
-        </View>
-      </Animated.View>
+                  <TouchableOpacity
+                    onPress={() => router.push(action.route as any)}
+                    activeOpacity={0.7}
+                  >
+                    <ModernCard variant="elevated" style={styles.actionCard}>
+                      <View style={[styles.actionIcon, { backgroundColor: action.color + '15' }]}>
+                        <Icon size={28} color={action.color} strokeWidth={2} />
+                      </View>
+                      <View style={styles.actionContent}>
+                        <Text style={styles.actionTitle}>{action.title}</Text>
+                        <Text style={styles.actionDescription}>{action.description}</Text>
+                      </View>
+                    </ModernCard>
+                  </TouchableOpacity>
+                </Animated.View>
+              );
+            })}
+          </View>
+        </Animated.View>
 
-      {/* Recent Activity */}
-      <Animated.View 
-        entering={FadeInDown.delay(800)}
-        style={styles.section}
-      >
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{isAdmin ? 'Pending Items' : 'Recent Activity'}</Text>
-          <TouchableOpacity onPress={() => router.push(isAdmin ? '/admin-queue' : '/activity' as any)}>
-            <Text style={styles.seeAllText}>View All</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.itemsList}>
-          {pendingItems.map((item, index) => (
-            <Animated.View
-              key={item.id}
-              entering={SlideInRight.delay(900 + index * 100)}
-            >
-              <ModernCard variant="elevated" style={styles.itemCard}>
-                <View style={styles.itemHeader}>
-                  <View style={styles.itemIcon}>
-                    <FileText size={20} color={Colors.accent} />
-                  </View>
-                  <View style={styles.itemInfo}>
-                    <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemId}>{item.id}</Text>
-                    <Text style={styles.itemDate}>{item.type} • {item.date}</Text>
-                  </View>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: getItemStatusColor(item.status) + '20' }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: getItemStatusColor(item.status) }
+        {/* Recent Activity */}
+        <Animated.View
+          entering={FadeInDown.delay(800)}
+          style={styles.section}
+        >
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>{isAdmin ? 'Pending Items' : 'Recent Activity'}</Text>
+            <TouchableOpacity onPress={() => router.push(isAdmin ? '/admin-queue' : '/activity' as any)}>
+              <Text style={styles.seeAllText}>View All</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.itemsList}>
+            {pendingItems.map((item, index) => (
+              <Animated.View
+                key={item.id}
+                entering={SlideInRight.delay(900 + index * 100)}
+              >
+                <ModernCard variant="elevated" style={styles.itemCard}>
+                  <View style={styles.itemHeader}>
+                    <View style={styles.itemIcon}>
+                      <FileText size={20} color={Colors.accent} />
+                    </View>
+                    <View style={styles.itemInfo}>
+                      <Text style={styles.itemName}>{item.name}</Text>
+                      <Text style={styles.itemId}>{item.id}</Text>
+                      <Text style={styles.itemDate}>{item.type} • {item.date}</Text>
+                    </View>
+                    <View style={[
+                      styles.statusBadge,
+                      { backgroundColor: getItemStatusColor(item.status) + '20' }
                     ]}>
-                      {item.status}
-                    </Text>
+                      <Text style={[
+                        styles.statusText,
+                        { color: getItemStatusColor(item.status) }
+                      ]}>
+                        {item.status}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </ModernCard>
-            </Animated.View>
-          ))}
-        </View>
-      </Animated.View>
-    </ScreenLayout>
+                </ModernCard>
+              </Animated.View>
+            ))}
+          </View>
+        </Animated.View>
+      </ScreenLayout>
+    </View>
   );
 }
 
@@ -201,6 +190,11 @@ function getItemStatusColor(status: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: Spacing.lg,
   },
 
   // Header Styles
