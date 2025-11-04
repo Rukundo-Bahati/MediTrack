@@ -1,21 +1,21 @@
 import { useRouter } from 'expo-router';
-import { AlertTriangle, Package, ScanLine, Shield, TrendingUp } from 'lucide-react-native';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AlertTriangle, Package, ScanLine, Shield } from 'lucide-react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
-  BounceIn,
-  FadeInLeft,
-  FadeInRight,
-  FadeInUp,
-  FlipInEasyX,
-  runOnJS,
-  SlideInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  ZoomIn
+    FadeInDown,
+    runOnJS,
+    SlideInRight,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, RoleColors } from '../../../constants/colors';
+import { ModernCard } from '../../../components/ui/modern-card';
+import { ScreenLayout } from '../../../components/ui/modern-layout';
+import { Colors } from '../../../constants/colors';
+import { Shadows } from '../../../constants/shadows';
+import { Spacing } from '../../../constants/spacing';
+import { Typography } from '../../../constants/typography';
 import { useAuth } from '../../context/AuthContext';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
@@ -73,263 +73,202 @@ export default function HomeScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <ScreenLayout scrollable style={styles.container}>
+      {/* Header */}
       <Animated.View 
-        entering={SlideInDown.delay(100).springify()}
-        style={[styles.header, { paddingTop: insets.top + 8 }]}
+        entering={FadeInDown.delay(100)}
+        style={styles.header}
       >
-        <Animated.View entering={FadeInLeft.delay(200)}>
-          <Text style={styles.greeting}>Welcome back,</Text>
-          <Text style={styles.userName}>{user?.name}</Text>
-        </Animated.View>
-        <Animated.View 
-          entering={FadeInRight.delay(300).springify()}
-          style={[styles.roleBadge, { backgroundColor: RoleColors[user?.role || 'consumer'] + '20' }]}
+        <View style={styles.headerContent}>
+          <View style={styles.headerIcon}>
+            <Shield size={32} color={Colors.primary} strokeWidth={2} />
+          </View>
+          <Text style={styles.greeting}>Medicine Verification</Text>
+          <Text style={styles.userName}>Welcome back, {user?.name}</Text>
+        </View>
+      </Animated.View>
+      {/* Hero Scan Section */}
+      <Animated.View 
+        entering={FadeInDown.delay(200)}
+        style={styles.heroSection}
+      >
+        <TouchableOpacity
+          onPress={handleScan}
+          activeOpacity={0.7}
         >
-          <Text style={[styles.roleText, { color: RoleColors[user?.role || 'consumer'] }]}>
-            {user?.role?.toUpperCase()}
-          </Text>
+          <ModernCard variant="primary" style={styles.scanCard}>
+            <View style={styles.scanIconContainer}>
+              <ScanLine size={48} color={Colors.white} strokeWidth={2} />
+            </View>
+            <View style={styles.scanContent}>
+              <Text style={styles.scanTitle}>Scan QR Code</Text>
+              <Text style={styles.scanDescription}>Verify medicine authenticity instantly</Text>
+            </View>
+          </ModernCard>
+        </TouchableOpacity>
+      </Animated.View>
+
+
+
+      {/* Stats */}
+      <Animated.View 
+        entering={FadeInDown.delay(300)}
+        style={styles.statsContainer}
+      >
+        <Animated.View entering={SlideInRight.delay(400)}>
+          <ModernCard variant="elevated" style={styles.statCard}>
+            <Shield size={24} color={Colors.primary} />
+            <Text style={styles.statNumber}>2,451</Text>
+            <Text style={styles.statLabel}>Verified Batches</Text>
+          </ModernCard>
+        </Animated.View>
+        <Animated.View entering={SlideInRight.delay(500)}>
+          <ModernCard variant="elevated" style={styles.statCard}>
+            <Package size={24} color={Colors.accent} />
+            <Text style={[styles.statNumber, { color: Colors.accent }]}>98.5%</Text>
+            <Text style={styles.statLabel}>Authentic Rate</Text>
+          </ModernCard>
         </Animated.View>
       </Animated.View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      {/* How It Works */}
+      <Animated.View 
+        entering={FadeInDown.delay(600)}
+        style={styles.section}
       >
-        <Animated.View 
-          entering={ZoomIn.delay(400).springify()}
-          style={styles.heroSection}
-        >
-          <AnimatedTouchableOpacity
-            style={[styles.scanCard, animatedScanCardStyle]}
-            {...createPressHandler(scanCardScale, handleScan)}
-          >
-            <Animated.View 
-              entering={BounceIn.delay(600)}
-              style={styles.scanIconContainer}
+        <Text style={styles.sectionTitle}>How It Works</Text>
+        <View style={styles.stepsContainer}>
+          {[
+            {
+              number: '1',
+              title: 'Scan QR Code',
+              description: 'Find the QR code on medicine packaging and scan it',
+              color: Colors.primary
+            },
+            {
+              number: '2',
+              title: 'Blockchain Verification',
+              description: 'System checks batch authenticity on blockchain',
+              color: Colors.accent
+            },
+            {
+              number: '3',
+              title: 'Get Results',
+              description: 'Instant verification with supply chain history',
+              color: Colors.primary
+            }
+          ].map((step, index) => (
+            <Animated.View
+              key={step.number}
+              entering={SlideInRight.delay(700 + index * 100)}
             >
-              <ScanLine size={48} color={Colors.white} strokeWidth={2} />
+              <ModernCard variant="elevated" style={styles.stepCard}>
+                <View style={[styles.stepNumber, { backgroundColor: step.color }]}>
+                  <Text style={styles.stepNumberText}>{step.number}</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>{step.title}</Text>
+                  <Text style={styles.stepDescription}>{step.description}</Text>
+                </View>
+              </ModernCard>
             </Animated.View>
-            <Animated.View 
-              entering={FadeInRight.delay(700)}
-              style={styles.scanContent}
-            >
-              <Text style={styles.scanTitle}>Scan QR Code</Text>
-              <Text style={styles.scanDescription}>Verify medicine authenticity instantly</Text>
-            </Animated.View>
-          </AnimatedTouchableOpacity>
-        </Animated.View>
-
-
-
-        <Animated.View 
-          entering={FadeInUp.delay(800).springify()}
-          style={styles.statsSection}
-        >
-          <Animated.View 
-            entering={FadeInLeft.delay(900)}
-            style={styles.statsGrid}
-          >
-            <Animated.View 
-              entering={FlipInEasyX.delay(1000)}
-              style={styles.statCard}
-            >
-              <Animated.View 
-                entering={BounceIn.delay(1100)}
-                style={[styles.statIcon, { backgroundColor: Colors.primary + '15' }]}
-              >
-                <Shield size={24} color={Colors.primary} />
-              </Animated.View>
-              <Text style={styles.statValue}>2,451</Text>
-              <Text style={styles.statLabel}>Verified Batches</Text>
-            </Animated.View>
-
-            <Animated.View 
-              entering={FlipInEasyX.delay(1100)}
-              style={styles.statCard}
-            >
-              <Animated.View 
-                entering={BounceIn.delay(1200)}
-                style={[styles.statIcon, { backgroundColor: Colors.accent + '15' }]}
-              >
-                <AlertTriangle size={24} color={Colors.accent} />
-              </Animated.View>
-              <Text style={styles.statValue}>12</Text>
-              <Text style={styles.statLabel}>Reports Filed</Text>
-            </Animated.View>
-
-            <Animated.View 
-              entering={FlipInEasyX.delay(1200)}
-              style={styles.statCard}
-            >
-              <Animated.View 
-                entering={BounceIn.delay(1300)}
-                style={[styles.statIcon, { backgroundColor: Colors.primary + '15' }]}
-              >
-                <Package size={24} color={Colors.primary} />
-              </Animated.View>
-              <Text style={styles.statValue}>98.5%</Text>
-              <Text style={styles.statLabel}>Authentic Rate</Text>
-            </Animated.View>
-
-            <Animated.View 
-              entering={FlipInEasyX.delay(1300)}
-              style={styles.statCard}
-            >
-              <Animated.View 
-                entering={BounceIn.delay(1400)}
-                style={[styles.statIcon, { backgroundColor: Colors.accent + '15' }]}
-              >
-                <TrendingUp size={24} color={Colors.accent} />
-              </Animated.View>
-              <Text style={styles.statValue}>+15%</Text>
-              <Text style={styles.statLabel}>This Month</Text>
-            </Animated.View>
-          </Animated.View>
-        </Animated.View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>How It Works</Text>
-          </View>
-          
-          <View style={styles.stepsContainer}>
-            <View style={styles.stepCard}>
-              <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
-                <Text style={styles.stepNumberText}>1</Text>
-              </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Scan QR Code</Text>
-                <Text style={styles.stepDescription}>Find the QR code on medicine packaging and scan it</Text>
-              </View>
-            </View>
-
-            <View style={styles.stepCard}>
-              <View style={[styles.stepNumber, { backgroundColor: Colors.accent }]}>
-                <Text style={styles.stepNumberText}>2</Text>
-              </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Blockchain Verification</Text>
-                <Text style={styles.stepDescription}>System checks batch authenticity on Ethereum blockchain</Text>
-              </View>
-            </View>
-
-            <View style={styles.stepCard}>
-              <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
-                <Text style={styles.stepNumberText}>3</Text>
-              </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Get Results</Text>
-                <Text style={styles.stepDescription}>Instant verification with full supply chain history</Text>
-              </View>
-            </View>
-          </View>
+          ))}
         </View>
+      </Animated.View>
 
-        <Animated.View 
-          entering={FadeInUp.delay(1800).springify()}
-          style={styles.quickActions}
-        >
-          <AnimatedTouchableOpacity
-            entering={ZoomIn.delay(1900).springify()}
-            style={[styles.quickActionCard, { borderColor: Colors.accent + '40' }, animatedQuickAction1Style]}
-            {...createPressHandler(quickAction1Scale, handleReportIssue)}
+      {/* Quick Actions */}
+      <Animated.View 
+        entering={FadeInDown.delay(1000)}
+        style={styles.quickActions}
+      >
+        <Animated.View entering={SlideInRight.delay(1100)}>
+          <TouchableOpacity
+            onPress={handleReportIssue}
+            activeOpacity={0.7}
           >
-            <Animated.View 
-              entering={BounceIn.delay(2000)}
-              style={[styles.quickActionIcon, { backgroundColor: Colors.accent + '15' }]}
-            >
-              <AlertTriangle size={24} color={Colors.accent} />
-            </Animated.View>
-            <Text style={[styles.quickActionText, { color: Colors.accent }]}>Report Suspicious</Text>
-          </AnimatedTouchableOpacity>
-
-          <AnimatedTouchableOpacity
-            entering={ZoomIn.delay(2000).springify()}
-            style={[styles.quickActionCard, { borderColor: Colors.primary + '40' }, animatedQuickAction2Style]}
-            {...createPressHandler(quickAction2Scale, handleViewAlerts)}
-          >
-            <Animated.View 
-              entering={BounceIn.delay(2100)}
-              style={[styles.quickActionIcon, { backgroundColor: Colors.primary + '15' }]}
-            >
-              <Package size={24} color={Colors.primary} />
-            </Animated.View>
-            <Text style={[styles.quickActionText, { color: Colors.primary }]}>View Alerts</Text>
-          </AnimatedTouchableOpacity>
+            <ModernCard variant="outlined" style={[styles.quickActionCard, { borderColor: Colors.accent }] as any}>
+              <View style={[styles.quickActionIcon, { backgroundColor: Colors.accent + '15' }]}>
+                <AlertTriangle size={24} color={Colors.accent} />
+              </View>
+              <Text style={[styles.quickActionText, { color: Colors.accent }]}>Report Suspicious</Text>
+            </ModernCard>
+          </TouchableOpacity>
         </Animated.View>
 
-        <View style={styles.infoCard}>
-          <Shield size={32} color={Colors.primary} />
+        <Animated.View entering={SlideInRight.delay(1200)}>
+          <TouchableOpacity
+            onPress={handleViewAlerts}
+            activeOpacity={0.7}
+          >
+            <ModernCard variant="outlined" style={[styles.quickActionCard, { borderColor: Colors.primary }] as any}>
+              <View style={[styles.quickActionIcon, { backgroundColor: Colors.primary + '15' }]}>
+                <Package size={24} color={Colors.primary} />
+              </View>
+              <Text style={[styles.quickActionText, { color: Colors.primary }]}>View Alerts</Text>
+            </ModernCard>
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
+
+      {/* Info Card */}
+      <Animated.View entering={FadeInDown.delay(1300)}>
+        <ModernCard variant="filled" style={styles.infoCard}>
+          <Shield size={48} color={Colors.primary} />
           <Text style={styles.infoTitle}>Fighting Counterfeit Drugs</Text>
           <Text style={styles.infoDescription}>
             500,000 deaths annually from fake medicines. Every scan helps protect lives.
           </Text>
-        </View>
-      </ScrollView>
-    </View>
+        </ModernCard>
+      </Animated.View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
   },
+
+  // Header Styles
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: Colors.white,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    paddingHorizontal: Spacing.layout.container,
+    paddingVertical: Spacing.xl,
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    ...Shadows.subtle,
   },
   greeting: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 2,
+    ...Typography.h1,
+    color: Colors.primary,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: Colors.text,
-    flexShrink: 1,
-    maxWidth: '80%',
+    ...Typography.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
   },
-  roleText: {
-    fontSize: 9,
-    fontWeight: '700' as const,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 16,
-  },
+
+  // Hero Section Styles
   heroSection: {
-    marginBottom: 24,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
   },
   scanCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.primary,
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
   },
   scanIconContainer: {
     width: 72,
@@ -338,183 +277,105 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: Spacing.lg,
   },
   scanContent: {
     flex: 1,
   },
   scanTitle: {
-    fontSize: 22,
-    fontWeight: '700' as const,
+    ...Typography.h2,
     color: Colors.white,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   scanDescription: {
-    fontSize: 14,
+    ...Typography.body,
     color: 'rgba(255, 255, 255, 0.9)',
   },
-  statsSection: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  statsGrid: {
+
+  // Stats Styles
+  statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
   },
   statCard: {
     flex: 1,
-    minWidth: '47%',
-    backgroundColor: Colors.backgroundSecondary,
-    borderRadius: 16,
-    padding: 16,
     alignItems: 'center',
+    paddingVertical: Spacing.lg,
+    gap: Spacing.sm,
   },
-  statIcon: {
+  statNumber: {
+    ...Typography.h2,
+    color: Colors.primary,
+  },
+  statLabel: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+
+  // Section Styles
+  section: {
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
+  },
+  sectionTitle: {
+    ...Typography.h3,
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
+
+  // Steps Styles
+  stepsContainer: {
+    gap: Spacing.md,
+  },
+  stepCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
+  stepNumber: {
     width: 48,
     height: 48,
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: Colors.primary,
-    textAlign: 'center',
-  },
-  stepsContainer: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  stepCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.backgroundSecondary,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  stepNumber: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
+    marginRight: Spacing.lg,
   },
   stepNumberText: {
-    fontSize: 18,
-    fontWeight: '700' as const,
+    ...Typography.h3,
     color: Colors.white,
   },
   stepContent: {
     flex: 1,
   },
   stepTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: Colors.primary,
-    marginBottom: 4,
+    ...Typography.bodyMedium,
+    color: Colors.text,
+    marginBottom: Spacing.xs,
   },
   stepDescription: {
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: Colors.textSecondary,
     lineHeight: 18,
   },
-  infoCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 24,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.primary + '20',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  infoTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: Colors.primary,
-    marginTop: 12,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  infoDescription: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  roleBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    maxWidth: 80,
-    alignItems: 'center',
-  },
+
+  // Quick Actions Styles
   quickActions: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
   },
   quickActionCard: {
     flex: 1,
-    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 2,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm,
   },
   quickActionIcon: {
     width: 48,
@@ -524,8 +385,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickActionText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
+    ...Typography.bodySmall,
+    fontWeight: '600',
     textAlign: 'center',
+  },
+
+  // Info Card Styles
+  infoCard: {
+    marginHorizontal: Spacing.layout.container,
+    alignItems: 'center',
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+  },
+  infoTitle: {
+    ...Typography.h3,
+    color: Colors.primary,
+    textAlign: 'center',
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  infoDescription: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

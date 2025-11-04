@@ -1,8 +1,16 @@
-import { AlertTriangle, Calendar, CheckCircle, Package, Search, XCircle } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { AlertTriangle, ArrowLeft, Calendar, CheckCircle, Package, Search, XCircle } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, RoleColors } from '../../../constants/colors';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp, SlideInRight } from 'react-native-reanimated';
+import { ModernButton } from '../../../components/ui/modern-button';
+import { ModernCard } from '../../../components/ui/modern-card';
+import { ModernInput } from '../../../components/ui/modern-input';
+import { ScreenLayout } from '../../../components/ui/modern-layout';
+import { Colors } from '../../../constants/colors';
+import { Shadows } from '../../../constants/shadows';
+import { Spacing } from '../../../constants/spacing';
+import { Typography } from '../../../constants/typography';
 
 interface BatchEvent {
   id: string;
@@ -15,7 +23,7 @@ interface BatchEvent {
 }
 
 export default function BatchAuditScreen() {
-  const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [events, setEvents] = useState<BatchEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -98,64 +106,95 @@ export default function BatchAuditScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.title}>Batch Audit</Text>
-        <Text style={styles.subtitle}>Search and audit blockchain batch events</Text>
-      </View>
-
-      <ScrollView 
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
-        showsVerticalScrollIndicator={false}
+    <ScreenLayout scrollable style={styles.container}>
+      {/* Back Button */}
+      <Animated.View
+        entering={FadeInDown.delay(100)}
+        style={styles.backButtonContainer}
       >
-        {/* Search Section */}
-        <View style={styles.searchSection}>
-          <View style={styles.searchContainer}>
-            <Search size={20} color={Colors.textSecondary} />
-            <TextInput
-              style={styles.searchInput}
-              onChangeText={setSearchQuery}
-              placeholder="Enter batch ID to audit"
-              placeholderTextColor={Colors.textSecondary}
-              value={searchQuery}
-            />
-          </View>
-          
-          <TouchableOpacity
-            style={[styles.searchButton, { backgroundColor: RoleColors.regulator }]}
-            onPress={handleSearch}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.searchButtonText}>
-              {loading ? 'Searching...' : 'Search'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)');
+            }
+          }}
+          activeOpacity={0.7}
+        >
+          <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
+        </TouchableOpacity>
+      </Animated.View>
 
-        {/* Results Section */}
-        {searched && (
-          <View style={styles.resultsSection}>
-            <Text style={styles.resultsTitle}>
-              Blockchain Events for: {searchQuery}
-            </Text>
-            
-            {events.length === 0 ? (
-              <View style={styles.emptyState}>
-                <XCircle size={48} color={Colors.textSecondary} />
-                <Text style={styles.emptyText}>No events found</Text>
-                <Text style={styles.emptySubtext}>
-                  This batch ID may not exist on the blockchain
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.eventsContainer}>
-                {events.map((event, index) => {
-                  const IconComponent = getEventIcon(event.eventName);
-                  const eventColor = getEventColor(event.eventName);
-                  
-                  return (
-                    <View key={event.id} style={styles.eventCard}>
+      {/* Header */}
+      <Animated.View
+        entering={FadeInDown.delay(200)}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.headerIcon}>
+            <Search size={32} color={Colors.primary} strokeWidth={2} />
+          </View>
+          <Text style={styles.title}>Batch Audit</Text>
+          <Text style={styles.subtitle}>
+            Search and audit blockchain batch events
+          </Text>
+        </View>
+      </Animated.View>
+
+      {/* Search Section */}
+      <Animated.View
+        entering={FadeInUp.delay(300)}
+        style={styles.searchSection}
+      >
+        <ModernInput
+          placeholder="Enter batch ID to audit..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          containerStyle={styles.searchInput}
+        />
+        
+        <ModernButton
+          title={loading ? 'Searching...' : 'Search Blockchain'}
+          onPress={handleSearch}
+          disabled={loading}
+          variant="primary"
+          size="large"
+          style={styles.searchButton}
+        />
+      </Animated.View>
+
+      {/* Results Section */}
+      {searched && (
+        <Animated.View
+          entering={FadeInUp.delay(400)}
+          style={styles.resultsSection}
+        >
+          <Text style={styles.resultsTitle}>
+            Blockchain Events for: {searchQuery}
+          </Text>
+          
+          {events.length === 0 ? (
+            <Animated.View entering={FadeInUp.delay(500)} style={styles.emptyState}>
+              <XCircle size={64} color={Colors.textSecondary} />
+              <Text style={styles.emptyText}>No events found</Text>
+              <Text style={styles.emptySubtext}>
+                This batch ID may not exist on the blockchain
+              </Text>
+            </Animated.View>
+          ) : (
+            <View style={styles.eventsContainer}>
+              {events.map((event, index) => {
+                const IconComponent = getEventIcon(event.eventName);
+                const eventColor = getEventColor(event.eventName);
+                
+                return (
+                  <Animated.View
+                    key={event.id}
+                    entering={SlideInRight.delay(500 + index * 100)}
+                  >
+                    <ModernCard variant="elevated" style={styles.eventCard}>
                       <View style={styles.eventLine}>
                         <View style={[styles.eventDot, { backgroundColor: eventColor }]}>
                           <IconComponent size={16} color={Colors.white} />
@@ -194,102 +233,117 @@ export default function BatchAuditScreen() {
                           </View>
                         )}
                       </View>
-                    </View>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-        )}
+                    </ModernCard>
+                  </Animated.View>
+                );
+              })}
+            </View>
+          )}
+        </Animated.View>
+      )}
 
-        {!searched && (
-          <View style={styles.instructionCard}>
-            <Package size={32} color={RoleColors.regulator} />
+      {!searched && (
+        <Animated.View entering={FadeInUp.delay(400)} style={styles.instructionContainer}>
+          <ModernCard variant="filled" style={styles.instructionCard}>
+            <Package size={48} color={Colors.primary} />
             <Text style={styles.instructionTitle}>Blockchain Audit Tool</Text>
             <Text style={styles.instructionText}>
               Enter a batch ID to view its complete blockchain history including registration, transfers, and verifications.
             </Text>
-          </View>
-        )}
-      </ScrollView>
-    </View>
+          </ModernCard>
+        </Animated.View>
+      )}
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
+
+  // Back Button Styles
+  backButtonContainer: {
+    paddingHorizontal: Spacing.layout.container,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.backgroundSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.subtle,
+  },
+
+  // Header Styles
   header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: Colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
+    paddingHorizontal: Spacing.layout.container,
+    paddingVertical: Spacing.lg,
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    ...Shadows.subtle,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '700' as const,
+    ...Typography.h1,
     color: Colors.text,
-    marginBottom: 4,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 14,
+    ...Typography.body,
     color: Colors.textSecondary,
+    textAlign: 'center',
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-  },
+
+  // Search Styles
   searchSection: {
-    marginBottom: 24,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-    marginBottom: 12,
-    gap: 12,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
   },
   searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.text,
+    marginBottom: 0,
   },
   searchButton: {
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    alignItems: 'center',
+    width: '100%',
   },
-  searchButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: Colors.white,
-  },
+
+  // Results Styles
   resultsSection: {
-    marginBottom: 24,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
   },
   resultsTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
+    ...Typography.h3,
     color: Colors.text,
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
+
+  // Events Styles
   eventsContainer: {
-    gap: 16,
+    gap: Spacing.lg,
   },
   eventCard: {
     flexDirection: 'row',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
   },
   eventLine: {
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: Spacing.md,
     width: 32,
   },
   eventDot: {
@@ -300,95 +354,94 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 3,
     borderColor: Colors.white,
+    ...Shadows.subtle,
   },
   eventConnector: {
     width: 2,
     flex: 1,
     backgroundColor: Colors.borderLight,
-    marginTop: 4,
+    marginTop: Spacing.xs,
   },
   eventContent: {
     flex: 1,
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
   },
   eventHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   eventName: {
-    fontSize: 16,
-    fontWeight: '600' as const,
+    ...Typography.bodyMedium,
+    fontWeight: '600',
   },
   eventTime: {
-    fontSize: 12,
+    ...Typography.caption,
     color: Colors.textSecondary,
   },
   eventDetails: {
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   eventBlock: {
-    fontSize: 14,
+    ...Typography.bodySmall,
     color: Colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   eventTx: {
-    fontSize: 12,
+    ...Typography.caption,
     fontFamily: 'monospace',
     color: Colors.textSecondary,
   },
   eventData: {
     backgroundColor: Colors.backgroundSecondary,
     borderRadius: 8,
-    padding: 12,
-    gap: 4,
+    padding: Spacing.sm,
+    gap: Spacing.xs,
   },
   eventDataItem: {
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: Colors.text,
   },
+
+  // Empty State Styles
   emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: Spacing.xxxl,
+    paddingHorizontal: Spacing.lg,
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: '600' as const,
+    ...Typography.h3,
     color: Colors.text,
-    marginTop: 16,
-    marginBottom: 8,
+    textAlign: 'center',
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   emptySubtext: {
-    fontSize: 14,
+    ...Typography.body,
     color: Colors.textSecondary,
     textAlign: 'center',
+  },
+
+  // Instruction Styles
+  instructionContainer: {
+    paddingHorizontal: Spacing.layout.container,
   },
   instructionCard: {
-    backgroundColor: RoleColors.regulator + '10',
-    borderRadius: 16,
-    padding: 24,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: RoleColors.regulator + '20',
+    paddingVertical: Spacing.xxxl,
+    paddingHorizontal: Spacing.lg,
   },
   instructionTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
+    ...Typography.h3,
     color: Colors.text,
-    marginTop: 12,
-    marginBottom: 8,
     textAlign: 'center',
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   instructionText: {
-    fontSize: 14,
+    ...Typography.body,
     color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
 });

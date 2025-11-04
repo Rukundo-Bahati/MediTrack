@@ -6,7 +6,7 @@ import { View, ViewStyle } from 'react-native';
 
 interface ModernCardProps {
   children: React.ReactNode;
-  variant?: 'elevated' | 'outlined' | 'filled' | 'subtle';
+  variant?: 'elevated' | 'outlined' | 'filled' | 'subtle' | 'primary';
   padding?: 'none' | 'small' | 'medium' | 'large';
   style?: ViewStyle;
 }
@@ -62,6 +62,13 @@ export const ModernCard: React.FC<ModernCardProps> = ({
           backgroundColor: Colors.primary + '05',
           borderWidth: 1,
           borderColor: Colors.primary + '10',
+        };
+      case 'primary':
+        return {
+          ...baseStyle,
+          ...paddingStyle,
+          backgroundColor: Colors.primary,
+          ...Shadows.primary,
         };
       default:
         return { ...baseStyle, ...paddingStyle };

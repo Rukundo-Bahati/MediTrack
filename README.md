@@ -238,13 +238,6 @@ npm run test:e2e
 2. Open app and scan generated codes
 3. Verify authentication results
 
-## Documentation
-
-- **[Installation Guide](INSTALL_GUIDE.md)** - Detailed setup instructions
-- **[QR Generator Guide](QR_GENERATOR_README.md)** - QR code testing setup
-- **[Loading Components](LOADING_COMPONENTS_README.md)** - UI component documentation
-- **[API Documentation](docs/api.md)** - Backend API reference
-- **[Blockchain Integration](docs/blockchain.md)** - Smart contract documentation
 
 ## Contributing
 
@@ -266,7 +259,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Check our comprehensive guides
 - **Issues**: Report bugs on GitHub Issues
 - **Community**: Join our Discord community
-- **Email**: support@meditrack.app
+- **Email**: rukundorca@gmail.com
 
 ## Acknowledgments
 

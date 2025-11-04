@@ -1,9 +1,20 @@
 import { useRouter } from 'expo-router';
-import { ScanLine, Truck } from 'lucide-react-native';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import {
+    CheckCircle,
+    Clock,
+    MapPin,
+    ScanLine,
+    Truck
+} from 'lucide-react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ModernCard } from '../../../components/ui/modern-card';
+import { ScreenLayout } from '../../../components/ui/modern-layout';
 import { Colors } from '../../../constants/colors';
+import { Shadows } from '../../../constants/shadows';
+import { Spacing } from '../../../constants/spacing';
+import { Typography } from '../../../constants/typography';
 import { useAuth } from '../../context/AuthContext';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
@@ -39,36 +50,45 @@ export default function DistributorHome() {
   ];
 
   return (
-    <ScrollView 
-      style={[styles.container, { paddingTop: insets.top }]}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScreenLayout scrollable style={styles.container}>
+      {/* Header */}
       <Animated.View 
         entering={FadeInDown.delay(100)}
         style={styles.header}
       >
-        <View>
-          <Text style={styles.greeting}>Verify & Transfer</Text>
-          <Text style={styles.userName}>{user?.name}</Text>
+        <View style={styles.headerContent}>
+          <View style={styles.headerIcon}>
+            <Truck size={32} color={Colors.primary} strokeWidth={2} />
+          </View>
+          <Text style={styles.greeting}>Supply Chain Hub</Text>
+          <Text style={styles.userName}>Welcome back, {user?.name}</Text>
         </View>
       </Animated.View>
 
+      {/* Stats */}
       <Animated.View 
         entering={FadeInDown.delay(200)}
         style={styles.statsContainer}
       >
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>42</Text>
-          <Text style={styles.statLabel}>Verified Today</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>18</Text>
-          <Text style={styles.statLabel}>In Transit</Text>
-        </View>
+        <Animated.View entering={SlideInRight.delay(300)}>
+          <ModernCard variant="elevated" style={styles.statCard}>
+            <CheckCircle size={24} color={Colors.primary} />
+            <Text style={styles.statNumber}>42</Text>
+            <Text style={styles.statLabel}>Verified Today</Text>
+          </ModernCard>
+        </Animated.View>
+        <Animated.View entering={SlideInRight.delay(400)}>
+          <ModernCard variant="elevated" style={styles.statCard}>
+            <Clock size={24} color={Colors.warning} />
+            <Text style={[styles.statNumber, { color: Colors.warning }]}>18</Text>
+            <Text style={styles.statLabel}>In Transit</Text>
+          </ModernCard>
+        </Animated.View>
       </Animated.View>
 
+      {/* Key Actions */}
       <Animated.View 
-        entering={FadeInDown.delay(300)}
+        entering={FadeInDown.delay(500)}
         style={styles.section}
       >
         <Text style={styles.sectionTitle}>Key Actions</Text>
@@ -76,27 +96,33 @@ export default function DistributorHome() {
           {primaryActions.map((action, index) => {
             const Icon = action.icon;
             return (
-              <AnimatedTouchableOpacity
+              <Animated.View
                 key={action.id}
-                entering={FadeInRight.delay(400 + index * 100)}
-                style={[styles.actionCard, { borderLeftColor: action.color }]}
-                onPress={() => router.push(action.route as any)}
+                entering={SlideInRight.delay(600 + index * 100)}
               >
-                <View style={[styles.actionIcon, { backgroundColor: action.color + '20' }]}>
-                  <Icon size={24} color={action.color} />
-                </View>
-                <View style={styles.actionContent}>
-                  <Text style={styles.actionTitle}>{action.title}</Text>
-                  <Text style={styles.actionDescription}>{action.description}</Text>
-                </View>
-              </AnimatedTouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => router.push(action.route as any)}
+                  activeOpacity={0.7}
+                >
+                  <ModernCard variant="elevated" style={styles.actionCard}>
+                    <View style={[styles.actionIcon, { backgroundColor: action.color + '15' }]}>
+                      <Icon size={28} color={action.color} strokeWidth={2} />
+                    </View>
+                    <View style={styles.actionContent}>
+                      <Text style={styles.actionTitle}>{action.title}</Text>
+                      <Text style={styles.actionDescription}>{action.description}</Text>
+                    </View>
+                  </ModernCard>
+                </TouchableOpacity>
+              </Animated.View>
             );
           })}
         </View>
       </Animated.View>
 
+      {/* Recent Transfers */}
       <Animated.View 
-        entering={FadeInDown.delay(600)}
+        entering={FadeInDown.delay(800)}
         style={styles.section}
       >
         <View style={styles.sectionHeader}>
@@ -109,30 +135,36 @@ export default function DistributorHome() {
           {recentTransfers.map((transfer, index) => (
             <Animated.View
               key={transfer.id}
-              entering={FadeInRight.delay(700 + index * 100)}
-              style={styles.transferCard}
+              entering={SlideInRight.delay(900 + index * 100)}
             >
-              <View style={styles.transferInfo}>
-                <Text style={styles.transferId}>{transfer.id}</Text>
-                <Text style={styles.transferBatch}>{transfer.batch}</Text>
-                <Text style={styles.transferDate}>{transfer.date}</Text>
-              </View>
-              <View style={[
-                styles.statusBadge,
-                { backgroundColor: getStatusColor(transfer.status) + '20' }
-              ]}>
-                <Text style={[
-                  styles.statusText,
-                  { color: getStatusColor(transfer.status) }
-                ]}>
-                  {transfer.status}
-                </Text>
-              </View>
+              <ModernCard variant="elevated" style={styles.transferCard}>
+                <View style={styles.transferHeader}>
+                  <View style={styles.transferIcon}>
+                    <MapPin size={20} color={Colors.accent} />
+                  </View>
+                  <View style={styles.transferInfo}>
+                    <Text style={styles.transferBatch}>{transfer.batch}</Text>
+                    <Text style={styles.transferId}>Transfer {transfer.id}</Text>
+                    <Text style={styles.transferDate}>{transfer.date}</Text>
+                  </View>
+                  <View style={[
+                    styles.statusBadge,
+                    { backgroundColor: getStatusColor(transfer.status) + '20' }
+                  ]}>
+                    <Text style={[
+                      styles.statusText,
+                      { color: getStatusColor(transfer.status) }
+                    ]}>
+                      {transfer.status.toUpperCase()}
+                    </Text>
+                  </View>
+                </View>
+              </ModernCard>
             </Animated.View>
           ))}
         </View>
       </Animated.View>
-    </ScrollView>
+    </ScreenLayout>
   );
 }
 
@@ -148,152 +180,160 @@ function getStatusColor(status: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
+
+  // Header Styles
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.layout.container,
+    paddingVertical: Spacing.xl,
+  },
+  headerContent: {
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+  },
+  headerIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    ...Shadows.subtle,
   },
   greeting: {
-    fontSize: 20,
-    fontWeight: '600' as const,
+    ...Typography.h1,
     color: Colors.primary,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
   },
   userName: {
-    fontSize: 16,
+    ...Typography.body,
     color: Colors.textSecondary,
-    marginTop: 4,
+    textAlign: 'center',
   },
+
+  // Stats Styles
   statsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    marginBottom: 32,
-    gap: 12,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
   },
   statCard: {
     flex: 1,
-    backgroundColor: Colors.white,
-    padding: 20,
-    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    paddingVertical: Spacing.lg,
+    gap: Spacing.sm,
   },
   statNumber: {
-    fontSize: 24,
-    fontWeight: '700' as const,
+    ...Typography.h2,
     color: Colors.primary,
   },
   statLabel: {
-    fontSize: 12,
+    ...Typography.caption,
     color: Colors.textSecondary,
-    marginTop: 4,
     textAlign: 'center',
   },
+
+  // Section Styles
   section: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.xl,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-    color: Colors.primary,
+    ...Typography.h3,
+    color: Colors.text,
   },
   seeAllText: {
-    fontSize: 14,
+    ...Typography.bodySmall,
     color: Colors.accent,
-    fontWeight: '600' as const,
+    fontWeight: '600',
   },
+
+  // Actions Styles
   actionsGrid: {
-    gap: 12,
+    gap: Spacing.md,
   },
   actionCard: {
-    backgroundColor: Colors.white,
-    padding: 20,
-    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    borderLeftWidth: 4,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.md,
   },
   actionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: Spacing.lg,
   },
   actionContent: {
     flex: 1,
   },
   actionTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: Colors.primary,
-    marginBottom: 4,
+    ...Typography.bodyMedium,
+    color: Colors.text,
+    marginBottom: Spacing.xs,
   },
   actionDescription: {
-    fontSize: 14,
+    ...Typography.bodySmall,
     color: Colors.textSecondary,
+    lineHeight: 18,
   },
+
+  // Transfers Styles
   transfersList: {
-    gap: 12,
+    gap: Spacing.md,
   },
   transferCard: {
-    backgroundColor: Colors.white,
-    padding: 16,
-    borderRadius: 12,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
+  transferHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+  },
+  transferIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.accent + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.md,
   },
   transferInfo: {
     flex: 1,
   },
-  transferId: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: Colors.primary,
-  },
   transferBatch: {
-    fontSize: 16,
+    ...Typography.bodyMedium,
     color: Colors.text,
-    marginTop: 2,
+    marginBottom: Spacing.xs,
+  },
+  transferId: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    fontFamily: 'monospace',
+    marginBottom: Spacing.xs,
   },
   transferDate: {
-    fontSize: 12,
+    ...Typography.caption,
     color: Colors.textSecondary,
-    marginTop: 2,
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
     borderRadius: 12,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: '600' as const,
+    ...Typography.caption,
+    fontWeight: '600',
   },
 });
