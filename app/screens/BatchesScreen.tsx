@@ -1,147 +1,488 @@
-import { Package, Plus } from 'lucide-react-native';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import {
+    ArrowLeft,
+    Calendar,
+    Hash,
+    Layers,
+    Package
+} from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+    BounceIn,
+    FadeInDown,
+    FadeInUp,
+    SlideInRight
+} from 'react-native-reanimated';
+import { ModernButton } from '../../components/ui/modern-button';
+import { ModernCard } from '../../components/ui/modern-card';
+import { ModernInput } from '../../components/ui/modern-input';
+import { ScreenLayout } from '../../components/ui/modern-layout';
 import { Colors } from '../../constants/colors';
+import { Shadows } from '../../constants/shadows';
+import { Spacing } from '../../constants/spacing';
+import { Typography } from '../../constants/typography';
 import { useAuth } from '../context/AuthContext';
-import { getAllBatches } from '../services/blockchainService';
+
+interface Batch {
+  id: string;
+  drugName: string;
+  lot: string;
+  expiry: string;
+  txHash: string;
+  createdAt: number;
+}
 
 export default function BatchesScreen() {
-  const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { user } = useAuth();
-  const batches = getAllBatches();
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredBatches, setFilteredBatches] = useState<Batch[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.title}>My Batches</Text>
-        {user?.role === 'manufacturer' && (
-          <TouchableOpacity style={styles.addButton}>
-            <Plus size={20} color={Colors.white} />
-          </TouchableOpacity>
-        )}
-      </View>
+  useEffect(() => {
+    loadBatches();
+  }, []);
 
-      <ScrollView 
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
-        showsVerticalScrollIndicator={false}
-      >
-        {batches.map((batch) => (
-          <View key={batch.batchId} style={styles.batchCard}>
-            <View style={styles.batchHeader}>
-              <View style={styles.batchIcon}>
-                <Package size={24} color={Colors.primary} />
-              </View>
-              <View style={styles.batchInfo}>
-                <Text style={styles.batchName}>{batch.drugName}</Text>
-                <Text style={styles.batchId}>{batch.batchId}</Text>
-              </View>
-              <View style={[
-                styles.statusBadge,
-                { backgroundColor: batch.status === 'active' ? Colors.accent + '20' : Colors.danger + '20' }
-              ]}>
-                <Text style={[
-                  styles.statusText,
-                  { color: batch.status === 'active' ? Colors.accent : Colors.danger }
-                ]}>
-                  {batch.status.toUpperCase()}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.batchDetails}>
-              <Text style={styles.detailText}>Lot: {batch.lotNumber}</Text>
-              <Text style={styles.detailText}>Qty: {batch.quantity.toLocaleString()}</Text>
-              <Text style={styles.detailText}>Expires: {new Date(batch.expiryDate).toLocaleDateString()}</Text>
+  useEffect(() => {
+    filterBatches();
+  }, [batches, searchQuery]);
+
+  const loadBatches = async () => {
+    try {
+      const raw = await AsyncStorage.getItem('medi_batches');
+      const batchesData = raw ? JSON.parse(raw) : [];
+      setBatches(batchesData);
+    } catch (error) {
+      console.error('Error loading batches:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterBatches = () => {
+    if (!searchQuery.trim()) {
+      setFilteredBatches(batches);
+      return;
+    }
+    
+    const filtered = batches.filter(batch =>
+      batch.drugName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      batch.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      batch.lot.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredBatches(filtered);
+  };
+
+  const handleDownloadQR = (batchId: string) => {
+    Alert.alert('Success', `QR code for ${batchId} ready to download`);
+  };
+
+  const handleShareQR = (batchId: string) => {
+    Alert.alert('Success', `QR code shared for ${batchId}`);
+  };
+
+  const renderBatchCard = (batch: Batch, index: number) => (
+    <Animated.View
+      key={batch.id}
+      entering={SlideInRight.delay(index * 100)}
+    >
+      <ModernCard variant="elevated" style={styles.batchCard}>
+        <View style={styles.batchHeader}>
+          <View style={styles.batchIcon}>
+            <Package size={24} color={Colors.primary} />
+          </View>
+          <View style={styles.batchInfo}>
+            <Text style={styles.batchName}>{batch.drugName}</Text>
+            <Text style={styles.batchId}>{batch.id}</Text>
+            <Text style={styles.batchDate}>
+              {new Date(batch.createdAt).toLocaleDateString()}
+            </Text>
+          </View>
+          <View style={styles.statusContainer}>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>ACTIVE</Text>
             </View>
           </View>
-        ))}
+        </View>
+
+        <View style={styles.batchDetails}>
+          <View style={styles.detailRow}>
+            <Hash size={16} color={Colors.textSecondary} />
+            <Text style={styles.detailLabel}>Lot Number:</Text>
+            <Text style={styles.detailValue}>{batch.lot}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Calendar size={16} color={Colors.textSecondary} />
+            <Text style={styles.detailLabel}>Expiry Date:</Text>
+            <Text style={styles.detailValue}>{batch.expiry}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Layers size={16} color={Colors.textSecondary} />
+            <Text style={styles.detailLabel}>Blockchain:</Text>
+            <Text style={styles.detailValueMono}>{batch.txHash.slice(0, 16)}...</Text>
+          </View>
+        </View>
+
+        <View style={styles.batchActions}>
+          <ModernButton
+            title="Download QR"
+            onPress={() => handleDownloadQR(batch.id)}
+            variant="outline"
+            size="small"
+            style={styles.actionButton}
+          />
+          <ModernButton
+            title="Share QR"
+            onPress={() => handleShareQR(batch.id)}
+            variant="ghost"
+            size="small"
+            style={styles.actionButton}
+          />
+        </View>
+      </ModernCard>
+    </Animated.View>
+  );
+
+  return (
+    <ScreenLayout style={styles.container}>
+      {/* Back Button */}
+      <Animated.View 
+        entering={FadeInDown.delay(100)}
+        style={styles.backButtonContainer}
+      >
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)');
+            }
+          }}
+          activeOpacity={0.7}
+        >
+          <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Header */}
+      <Animated.View 
+        entering={FadeInDown.delay(200)}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.headerIcon}>
+            <Package size={32} color={Colors.primary} strokeWidth={2} />
+          </View>
+          <Text style={styles.title}>My Batches</Text>
+          <Text style={styles.subtitle}>
+            Manage and track your registered medicine batches
+          </Text>
+        </View>
+
+        {user?.role === 'manufacturer' && (
+          <Animated.View entering={BounceIn.delay(400)}>
+            <ModernButton
+              title="Register New Batch"
+              onPress={() => router.push('/register-batch')}
+              variant="primary"
+              size="medium"
+              style={styles.addButton}
+            />
+          </Animated.View>
+        )}
+      </Animated.View>
+
+      {/* Search Bar */}
+      <Animated.View 
+        entering={FadeInUp.delay(300)}
+        style={styles.searchContainer}
+      >
+        <ModernInput
+          placeholder="Search batches by name, ID, or lot number..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          containerStyle={styles.searchInput}
+        />
+      </Animated.View>
+
+      {/* Stats */}
+      <Animated.View 
+        entering={FadeInUp.delay(400)}
+        style={styles.statsContainer}
+      >
+        <ModernCard variant="filled" style={styles.statCard}>
+          <Text style={styles.statNumber}>{batches.length}</Text>
+          <Text style={styles.statLabel}>Total Batches</Text>
+        </ModernCard>
+        <ModernCard variant="filled" style={styles.statCard}>
+          <Text style={styles.statNumber}>{filteredBatches.length}</Text>
+          <Text style={styles.statLabel}>Showing</Text>
+        </ModernCard>
+      </Animated.View>
+
+      {/* Batches List */}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {loading ? (
+          <Animated.View entering={FadeInUp.delay(500)} style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading batches...</Text>
+          </Animated.View>
+        ) : filteredBatches.length === 0 ? (
+          <Animated.View entering={FadeInUp.delay(500)} style={styles.emptyContainer}>
+            <Package size={64} color={Colors.textSecondary} />
+            <Text style={styles.emptyTitle}>
+              {searchQuery ? 'No batches found' : 'No batches registered yet'}
+            </Text>
+            <Text style={styles.emptySubtitle}>
+              {searchQuery 
+                ? 'Try adjusting your search terms' 
+                : 'Register your first batch to get started'
+              }
+            </Text>
+            {!searchQuery && user?.role === 'manufacturer' && (
+              <ModernButton
+                title="Register First Batch"
+                onPress={() => router.push('/register-batch')}
+                variant="primary"
+                size="medium"
+                style={styles.emptyButton}
+              />
+            )}
+          </Animated.View>
+        ) : (
+          <View style={styles.batchesList}>
+            {filteredBatches.map((batch, index) => renderBatchCard(batch, index))}
+          </View>
+        )}
       </ScrollView>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: Colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
+
+  // Back Button Styles
+  backButtonContainer: {
+    paddingHorizontal: Spacing.layout.container,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: Colors.text,
-  },
-  addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.primary,
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.backgroundSecondary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...Shadows.subtle,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
+
+  // Header Styles
+  header: {
+    paddingHorizontal: Spacing.layout.container,
+    paddingVertical: Spacing.lg,
   },
-  batchCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  batchHeader: {
-    flexDirection: 'row',
+  headerContent: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: Spacing.lg,
   },
-  batchIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  headerIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: Colors.primary + '15',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginBottom: Spacing.md,
+    ...Shadows.subtle,
+  },
+  title: {
+    ...Typography.h1,
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+  addButton: {
+    alignSelf: 'center',
+  },
+
+  // Search Styles
+  searchContainer: {
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.lg,
+  },
+  searchInput: {
+    marginBottom: 0,
+  },
+
+  // Stats Styles
+  statsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: Spacing.layout.container,
+    marginBottom: Spacing.lg,
+    gap: Spacing.md,
+  },
+  statCard: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.md,
+  },
+  statNumber: {
+    ...Typography.h2,
+    color: Colors.primary,
+    marginBottom: Spacing.xs,
+  },
+  statLabel: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+  },
+
+  // Scroll Styles
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: Spacing.layout.container,
+    paddingBottom: Spacing.xl,
+  },
+
+  // Batch Card Styles
+  batchesList: {
+    gap: Spacing.md,
+  },
+  batchCard: {
+    marginBottom: 0,
+  },
+  batchHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.md,
+  },
+  batchIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.md,
   },
   batchInfo: {
     flex: 1,
   },
   batchName: {
-    fontSize: 16,
-    fontWeight: '600' as const,
+    ...Typography.bodyMedium,
     color: Colors.text,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   batchId: {
-    fontSize: 12,
+    ...Typography.caption,
     color: Colors.textSecondary,
     fontFamily: 'monospace',
+    marginBottom: Spacing.xs,
+  },
+  batchDate: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+  },
+  statusContainer: {
+    alignItems: 'flex-end',
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+    backgroundColor: Colors.accent + '20',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 12,
   },
   statusText: {
-    fontSize: 10,
-    fontWeight: '700' as const,
+    ...Typography.caption,
+    color: Colors.accent,
+    fontWeight: '600',
   },
+
+  // Detail Styles
   batchDetails: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
   },
-  detailText: {
-    fontSize: 13,
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  detailLabel: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    minWidth: 80,
+  },
+  detailValue: {
+    ...Typography.caption,
+    color: Colors.text,
+    fontWeight: '500',
+    flex: 1,
+  },
+  detailValueMono: {
+    ...Typography.caption,
+    color: Colors.text,
+    fontWeight: '500',
+    fontFamily: 'monospace',
+    flex: 1,
+  },
+
+  // Action Styles
+  batchActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  actionButton: {
+    flex: 1,
+  },
+
+  // Empty State Styles
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xxxl,
+    paddingHorizontal: Spacing.lg,
+  },
+  emptyTitle: {
+    ...Typography.h3,
+    color: Colors.text,
+    textAlign: 'center',
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
+  emptySubtitle: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.xl,
+  },
+  emptyButton: {
+    minWidth: 200,
+  },
+
+  // Loading Styles
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xxxl,
+  },
+  loadingText: {
+    ...Typography.body,
     color: Colors.textSecondary,
   },
 });

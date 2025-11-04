@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import {
+  ArrowLeft,
   CheckCircle,
   Hash,
   Info,
@@ -9,7 +11,7 @@ import {
   Sparkles
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Animated, {
   BounceIn,
@@ -38,6 +40,7 @@ const registerBatch = async (data: any) => {
 };
 
 export default function RegisterBatch() {
+  const router = useRouter();
   const [drugName, setDrugName] = useState('Amoxicillin 500mg');
   const [lot, setLot] = useState('LOT-12345');
   const [expiry, setExpiry] = useState('2026-12-31');
@@ -85,6 +88,20 @@ export default function RegisterBatch() {
   if (created) {
     return (
       <ScreenLayout scrollable style={styles.container}>
+        {/* Back Button */}
+        <Animated.View
+          entering={FadeInDown.delay(100)}
+          style={styles.backButtonContainer}
+        >
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setCreated(null)}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
+          </TouchableOpacity>
+        </Animated.View>
+
         {/* Success Hero Section */}
         <Animated.View
           entering={ZoomIn.delay(200)}
@@ -211,6 +228,26 @@ export default function RegisterBatch() {
 
   return (
     <ScreenLayout scrollable style={styles.container}>
+      {/* Back Button */}
+      <Animated.View
+        entering={FadeInDown.delay(100)}
+        style={styles.backButtonContainer}
+      >
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)');
+            }
+          }}
+          activeOpacity={0.7}
+        >
+          <ArrowLeft size={24} color={Colors.text} strokeWidth={2} />
+        </TouchableOpacity>
+      </Animated.View>
+
       {/* Header Section */}
       <Animated.View
         entering={FadeInDown.delay(200)}
@@ -329,6 +366,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  // Back Button Styles
+  backButtonContainer: {
+    paddingHorizontal: Spacing.layout.container,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.backgroundSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.subtle,
+  },
+
   // Header Styles
   header: {
     alignItems: 'center',
@@ -421,6 +474,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.layout.container,
     backgroundColor: Colors.primary,
     marginHorizontal: Spacing.layout.container,
+    marginTop: Spacing.xl,
     marginBottom: Spacing.lg,
     borderRadius: 24,
     position: 'relative',

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Plus, QrCode } from 'lucide-react-native';
+import { Package, Plus } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,12 +23,12 @@ export default function ManufacturerHome() {
       route: '/register-batch',
     },
     {
-      id: 'generate-qr',
-      title: 'Generate QR Codes',
-      description: 'Generate QR codes for registered batches',
-      icon: QrCode,
+      id: 'view-batches',
+      title: 'View All Batches',
+      description: 'Manage and track your registered batches',
+      icon: Package,
       color: Colors.accent,
-      route: '/generate-qr',
+      route: '/batches',
     },
   ];
 

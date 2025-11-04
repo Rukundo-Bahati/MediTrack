@@ -23,12 +23,12 @@ export default function DistributorHome() {
       route: '/scan',
     },
     {
-      id: 'transfer',
-      title: 'Transfer Batch',
-      description: 'Pass verified batch to next handler',
+      id: 'record-transit',
+      title: 'Record Transit',
+      description: 'Scan to record shipment to next handler',
       icon: Truck,
       color: Colors.accent,
-      route: '/transfer-batch',
+      route: '/record-transit',
     },
   ];
 
