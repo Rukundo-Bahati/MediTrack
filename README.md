@@ -278,6 +278,192 @@ Consumer → verifyBatch() → Complete History Retrieved
 ### **Demo Mode**
 The app works perfectly out-of-the-box with simulated blockchain data. For real blockchain deployment, see [BLOCKCHAIN_SETUP.md](BLOCKCHAIN_SETUP.md).
 
+## MetaMask Integration & Stakeholder Roles
+
+**MetaMask Wallet Integration**: MediTrack integrates with MetaMask to provide secure, decentralized identity and transaction signing for pharmaceutical supply chain participants.
+
+### Core Role: Digital Identity & Authentication
+
+MetaMask serves as the bridge between users and the blockchain, providing:
+- **Digital Wallet**: Secure storage of private keys and blockchain credentials
+- **Identity Provider**: Each wallet address represents a unique stakeholder in the supply chain
+- **Transaction Signer**: Cryptographic signing of all blockchain transactions
+- **Network Gateway**: Connection to multiple blockchain networks (Ethereum, Polygon, BSC)
+
+### Stakeholder Roles in the Supply Chain
+
+The MetaMask integration enables role-based access for different pharmaceutical stakeholders:
+
+#### **Manufacturers** (Role 0)
+**Wallet Functions:**
+- **Batch Registration**: Register new medicine batches on blockchain with cryptographic proof
+- **Quality Control**: Sign quality certificates and manufacturing records
+- **Supply Chain Initiation**: Create initial blockchain record for new medicines
+- **Regulatory Compliance**: Submit manufacturing data to regulatory smart contracts
+
+**Example Workflow:**
+```
+Manufacturer Wallet (0x1234...) → Connect to MediTrack
+→ Register Batch "PARA001" → Sign Transaction → Blockchain Record Created
+→ Transfer to Distributor → Sign Transfer Transaction → Ownership Updated
+```
+
+#### **Distributors** (Role 1)
+**Wallet Functions:**
+- **Batch Reception**: Confirm receipt of medicine batches from manufacturers
+- **Transport Tracking**: Sign location and condition updates during transport
+- **Inventory Management**: Update stock levels and storage conditions
+- **Chain of Custody**: Maintain cryptographic proof of possession
+
+**Example Workflow:**
+```
+Distributor Wallet (0x5678...) → Receive Batch Transfer
+→ Sign Receipt Confirmation → Update Location Data
+→ Transfer to Pharmacy → Sign Final Transfer → Complete Chain
+```
+
+#### **Pharmacists** (Role 2)
+**Wallet Functions:**
+- **Final Verification**: Confirm receipt of authentic medicines
+- **Dispensing Records**: Record medicine dispensing to patients
+- **Inventory Tracking**: Manage pharmacy stock and expiry monitoring
+- **Patient Safety**: Ensure only verified medicines reach consumers
+
+**Example Workflow:**
+```
+Pharmacist Wallet (0x9abc...) → Receive from Distributor
+→ Verify Batch Authenticity → Sign Receipt
+→ Dispense to Patient → Update Blockchain Status
+```
+
+#### **Regulators** (Role 3)
+**Wallet Functions:**
+- **Market Surveillance**: Monitor pharmaceutical supply chains
+- **Compliance Verification**: Verify regulatory compliance across stakeholders
+- **Investigation Tools**: Access complete audit trails for investigations
+- **Emergency Actions**: Execute recalls and safety alerts
+
+**Example Workflow:**
+```
+Regulator Wallet (0xdef0...) → Access All Supply Chain Data
+→ Verify Compliance → Generate Reports
+→ Issue Recall (if needed) → Sign Emergency Action
+```
+
+### Key MetaMask Functions in MediTrack
+
+#### **1. Secure Authentication**
+```typescript
+// Connect wallet to establish identity
+const walletState = await walletService.connect();
+// Returns: { address, chainId, balance, networkName }
+```
+
+#### **2. Transaction Signing**
+```typescript
+// Sign blockchain transactions for supply chain actions
+const txHash = await walletService.signTransaction({
+  to: contractAddress,
+  data: batchRegistrationData,
+  value: '0x0'
+});
+```
+
+#### **3. Message Signing**
+```typescript
+// Sign messages for off-chain verification
+const signature = await walletService.signMessage(
+  `Verify batch ${batchId} for ${drugName}`
+);
+```
+
+#### **4. Network Management**
+```typescript
+// Switch between different blockchain networks
+await walletService.switchNetwork('mumbai'); // Polygon testnet
+await walletService.switchNetwork('sepolia'); // Ethereum testnet
+```
+
+### Multi-Network Support
+
+**Supported Blockchain Networks:**
+- **Ethereum Mainnet**: Production deployment for high-value medicines
+- **Polygon Mumbai**: Fast, low-cost transactions for testing and development
+- **Sepolia Testnet**: Ethereum testnet for development and demonstrations
+- **BSC Testnet**: Alternative low-cost network for global accessibility
+
+### Security Features
+
+#### **Role-Based Access Control**
+```solidity
+// Smart contract enforces wallet-based permissions
+modifier onlyManufacturer() {
+    require(stakeholders[msg.sender].role == StakeholderRole.MANUFACTURER);
+    _;
+}
+```
+
+#### **Cryptographic Verification**
+- Every action requires wallet signature
+- Immutable audit trail of all transactions
+- Non-repudiation through blockchain records
+- Multi-signature support for high-value operations
+
+#### **Transaction Integrity**
+- Gas estimation for cost prediction
+- Transaction receipt verification
+- Confirmation waiting with timeout handling
+- Automatic retry mechanisms for failed transactions
+
+### User Experience Modes
+
+#### **Demo Mode** (No Wallet Required)
+- Simulated blockchain interactions for demonstrations
+- Full functionality without MetaMask installation
+- Perfect for showcasing supply chain transparency
+- No gas fees or real blockchain transactions
+
+#### **Wallet Mode** (MetaMask Required)
+- Real blockchain transactions with cryptographic security
+- Actual gas fees (minimal on testnets)
+- Permanent, immutable blockchain records
+- Full decentralized trust model
+
+### Integration Benefits
+
+#### **Trust & Transparency**
+- Cryptographically signed transactions eliminate fraud
+- Immutable blockchain records prevent data manipulation
+- Decentralized verification removes single points of failure
+- Public auditability of entire supply chain
+
+#### **Anti-Counterfeiting**
+- Only authorized wallets can register medicine batches
+- Counterfeit medicines cannot be added to the verified supply chain
+- Real-time authenticity verification for consumers
+- Automatic detection of unauthorized batch modifications
+
+#### **Regulatory Compliance**
+- Complete traceability from manufacturer to patient
+- Automated compliance reporting with cryptographic proof
+- Recall management with blockchain-verified execution
+- Cross-border regulatory cooperation through standardized records
+
+#### **Global Interoperability**
+- Works across international borders and jurisdictions
+- Standardized verification process for all stakeholders
+- Multi-language support with consistent blockchain backend
+- Seamless integration with existing pharmaceutical systems
+
+### Future MetaMask Enhancements
+
+**Planned Integrations:**
+- **Hardware Wallet Support**: Integration with Ledger and Trezor devices
+- **Multi-signature Transactions**: Require multiple approvals for critical operations
+- **Biometric Authentication**: Enhanced security through biometric verification
+- **Cross-chain Bridges**: Support for multiple blockchain networks simultaneously
+- **Smart Contract Governance**: Stakeholder voting on protocol upgrades
+
 ## Getting Started
 
 ### **Prerequisites**

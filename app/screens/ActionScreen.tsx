@@ -9,10 +9,10 @@ import { useAuth } from '../context/AuthContext';
 export default function ActionsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
 
   const getActionsForRole = () => {
-    switch (user?.role) {
+    switch (userProfile?.role) {
       case 'manufacturer':
         return [
           { title: 'Register New Batch', description: 'Add batch to blockchain', icon: Package, route: '/register-batch', color: Colors.primary },
@@ -59,7 +59,7 @@ export default function ActionsScreen() {
 
   return (
     <View style={styles.container}>
-      <ModernNavbar title={`Quick Actions - ${user?.role?.toUpperCase()}`} />
+      <ModernNavbar title={`Quick Actions - ${userProfile?.role?.toUpperCase()}`} />
 
       <ScrollView 
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}

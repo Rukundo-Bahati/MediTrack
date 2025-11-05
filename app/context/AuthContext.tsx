@@ -1,117 +1,169 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useWallet } from './WalletContext';
 
-export type UserRole = 'pharmacist' | 'distributor' | 'manufacturer' | 'regulator' | 'admin' | 'guest';
+export type UserRole = 'consumer' | 'manufacturer' | 'distributor' | 'pharmacist' | 'regulator';
 
-type User = {
-  id: string;
-  name: string;
-  email?: string;
+type UserProfile = {
   role: UserRole;
-  token?: string; // mock JWT
-  companyName?: string;
-  licenseNumber?: string;
-  businessId?: string;
-  region?: string;
-  facilityName?: string;
-  location?: string;
+  walletAddress?: string;
+  isOnboardingComplete: boolean;
+  preferences: {
+    preferredNetwork?: string;
+    notifications?: boolean;
+    language?: string;
+  };
 };
 
 type AuthContextValue = {
-  user: User | null;
+  userProfile: UserProfile | null;
   loading: boolean;
-  login: (role: UserRole, opts?: { 
-    name?: string; 
-    email?: string; 
-    companyName?: string;
-    licenseNumber?: string;
-    businessId?: string;
-    region?: string;
-    facilityName?: string;
-    location?: string;
-  }) => Promise<void>;
-  logout: () => Promise<void>;
-  setRole: (role: UserRole) => void;
+  isAuthenticated: boolean;
+  hasSeenOnboarding: boolean;
+  setUserRole: (role: UserRole) => Promise<void>;
   completeOnboarding: () => Promise<void>;
+  completeInitialOnboarding: () => Promise<void>;
+  logout: () => Promise<void>;
+  requiresWallet: (role: UserRole) => boolean;
 };
 
 const AuthContext = createContext<AuthContextValue>({
-  user: null,
+  userProfile: null,
   loading: false,
-  login: async () => {},
-  logout: async () => {},
-  setRole: () => {},
+  isAuthenticated: false,
+  hasSeenOnboarding: false,
+  setUserRole: async () => {},
   completeOnboarding: async () => {},
+  completeInitialOnboarding: async () => {},
+  logout: async () => {},
+  requiresWallet: () => false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { walletState } = useWallet();
 
   useEffect(() => {
-    // hydrate from storage
-    (async () => {
-      try {
-        const raw = await AsyncStorage.getItem('medi_user');
-        if (raw) setUser(JSON.parse(raw));
-      } catch (e) {
-        // ignore
-      } finally {
-        setLoading(false);
-      }
-    })();
+    loadUserProfile();
   }, []);
 
-  const login = async (role: UserRole, opts?: { 
-    name?: string; 
-    email?: string; 
-    companyName?: string;
-    licenseNumber?: string;
-    businessId?: string;
-    region?: string;
-    facilityName?: string;
-    location?: string;
-  }) => {
-    setLoading(true);
-    // mock JWT and user id
-    const newUser: User = {
-      id: `${role}_1`,
-      name: opts?.name || `${role.charAt(0).toUpperCase() + role.slice(1)}`,
-      email: opts?.email,
+  useEffect(() => {
+    // Update wallet address when wallet connects/disconnects
+    if (userProfile && walletState.address !== userProfile.walletAddress) {
+      updateUserProfile({
+        ...userProfile,
+        walletAddress: walletState.address || undefined,
+      });
+    }
+  }, [walletState.address]);
+
+  const loadUserProfile = async () => {
+    try {
+      const [storedProfile, storedOnboarding] = await Promise.all([
+        AsyncStorage.getItem('user_profile'),
+        AsyncStorage.getItem('has_seen_onboarding')
+      ]);
+      
+      if (storedProfile) {
+        const profile = JSON.parse(storedProfile);
+        setUserProfile(profile);
+      }
+      
+      if (storedOnboarding) {
+        setHasSeenOnboarding(JSON.parse(storedOnboarding));
+      }
+    } catch (error) {
+      console.error('Failed to load user profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserProfile = async (profile: UserProfile) => {
+    try {
+      await AsyncStorage.setItem('user_profile', JSON.stringify(profile));
+      setUserProfile(profile);
+    } catch (error) {
+      console.error('Failed to save user profile:', error);
+    }
+  };
+
+  const setUserRole = async (role: UserRole) => {
+    const newProfile: UserProfile = {
       role,
-      token: 'mock-jwt-token',
-      companyName: opts?.companyName,
-      licenseNumber: opts?.licenseNumber,
-      businessId: opts?.businessId,
-      region: opts?.region,
-      facilityName: opts?.facilityName,
-      location: opts?.location,
+      walletAddress: walletState.address || undefined,
+      isOnboardingComplete: false,
+      preferences: {
+        preferredNetwork: 'mumbai',
+        notifications: true,
+        language: 'en',
+      },
     };
-    await AsyncStorage.setItem('medi_user', JSON.stringify(newUser));
-    setUser(newUser);
-    setLoading(false);
-  };
-
-  const logout = async () => {
-    setLoading(true);
-    await AsyncStorage.removeItem('medi_user');
-    setUser(null);
-    setLoading(false);
-  };
-
-  const setRole = (role: UserRole) => {
-    if (!user) return;
-    const u = { ...user, role };
-    setUser(u);
-    AsyncStorage.setItem('medi_user', JSON.stringify(u));
+    
+    await updateUserProfile(newProfile);
   };
 
   const completeOnboarding = async () => {
-    await AsyncStorage.setItem('onboarding_completed', 'true');
+    if (userProfile) {
+      await updateUserProfile({
+        ...userProfile,
+        isOnboardingComplete: true,
+      });
+    }
   };
 
+  const completeInitialOnboarding = async () => {
+    try {
+      await AsyncStorage.setItem('has_seen_onboarding', JSON.stringify(true));
+      setHasSeenOnboarding(true);
+    } catch (error) {
+      console.error('Failed to save onboarding completion:', error);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await Promise.all([
+        AsyncStorage.removeItem('user_profile'),
+        AsyncStorage.removeItem('has_seen_onboarding')
+      ]);
+      setUserProfile(null);
+      setHasSeenOnboarding(false);
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  };
+
+  const requiresWallet = (role: UserRole): boolean => {
+    return role !== 'consumer';
+  };
+
+  const isAuthenticated = (() => {
+    if (!userProfile) return false;
+    
+    // Consumer role doesn't require wallet
+    if (userProfile.role === 'consumer') {
+      return userProfile.isOnboardingComplete;
+    }
+    
+    // Other roles require wallet connection
+    return userProfile.isOnboardingComplete && walletState.isConnected;
+  })();
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, setRole, completeOnboarding }}>
+    <AuthContext.Provider value={{
+      userProfile,
+      loading,
+      isAuthenticated,
+      hasSeenOnboarding,
+      setUserRole,
+      completeOnboarding,
+      completeInitialOnboarding,
+      logout,
+      requiresWallet,
+    }}>
       {children}
     </AuthContext.Provider>
   );

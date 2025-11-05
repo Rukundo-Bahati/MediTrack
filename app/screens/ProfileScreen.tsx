@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuth();
+  const { userProfile, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -23,16 +23,16 @@ export default function ProfileScreen() {
       >
         {/* User Info Card */}
         <View style={styles.userCard}>
-          <View style={[styles.avatar, { backgroundColor: RoleColors[user?.role || 'consumer'] + '20' }]}>
-            <User size={32} color={RoleColors[user?.role || 'consumer']} />
+          <View style={[styles.avatar, { backgroundColor: RoleColors[userProfile?.role || 'consumer'] + '20' }]}>
+            <User size={32} color={RoleColors[userProfile?.role || 'consumer']} />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user?.name || 'Guest User'}</Text>
-            <Text style={styles.userEmail}>{user?.email || 'No email provided'}</Text>
-            <View style={[styles.roleBadge, { backgroundColor: RoleColors[user?.role || 'consumer'] + '20' }]}>
-              <Shield size={14} color={RoleColors[user?.role || 'consumer']} />
-              <Text style={[styles.roleText, { color: RoleColors[user?.role || 'consumer'] }]}>
-                {user?.role?.toUpperCase() || 'GUEST'}
+            <Text style={styles.userName}>{userProfile?.walletAddress ? `${userProfile.walletAddress.substring(0, 8)}...` : 'Guest User'}</Text>
+            <Text style={styles.userEmail}>{userProfile?.walletAddress || 'No wallet connected'}</Text>
+            <View style={[styles.roleBadge, { backgroundColor: RoleColors[userProfile?.role || 'consumer'] + '20' }]}>
+              <Shield size={14} color={RoleColors[userProfile?.role || 'consumer']} />
+              <Text style={[styles.roleText, { color: RoleColors[userProfile?.role || 'consumer'] }]}>
+                {userProfile?.role?.toUpperCase() || 'GUEST'}
               </Text>
             </View>
           </View>

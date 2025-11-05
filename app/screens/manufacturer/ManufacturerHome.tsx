@@ -1,9 +1,9 @@
 import { ModernNavbar } from '@/components/ui';
 import { useRouter } from 'expo-router';
 import {
-  Package,
-  Plus,
-  TrendingUp
+    Package,
+    Plus,
+    TrendingUp
 } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
@@ -14,12 +14,13 @@ import { Colors } from '../../../constants/colors';
 import { Shadows } from '../../../constants/shadows';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
+import WalletConnect from '../../components/WalletConnect';
 import { useAuth } from '../../context/AuthContext';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function ManufacturerHome() {
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -31,6 +32,14 @@ export default function ManufacturerHome() {
       icon: Plus,
       color: Colors.primary,
       route: '/register-batch',
+    },
+    {
+      id: 'web3-register-batch',
+      title: 'Web3 Batch Registration',
+      description: 'Register batch with MetaMask wallet',
+      icon: Plus,
+      color: Colors.success,
+      route: '/web3-register-batch',
     },
     {
       id: 'view-batches',
@@ -52,6 +61,11 @@ export default function ManufacturerHome() {
     <View style={styles.container}>
       <ModernNavbar title="Manufacturing Dashboard" />
       <ScreenLayout scrollable style={styles.scrollContainer}>
+
+        {/* Wallet Connection */}
+        <Animated.View entering={FadeInDown.delay(100)}>
+          <WalletConnect showBalance={false} />
+        </Animated.View>
 
         {/* Stats */}
         <Animated.View

@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { useRouter } from 'expo-router';
-import { Package, ScanLine } from 'lucide-react-native';
+import { Package, ScanLine, Shield } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -31,8 +31,8 @@ const slides = [
   {
     id: 2,
     title: 'Blockchain Protection',
-    description: 'Every medicine tracked on Ethereum. Tamper-proof, transparent, and trustworthy.',
-    Icon: Package,
+    description: 'Every medicine tracked on blockchain. Tamper-proof, transparent, and trustworthy.',
+    Icon: Shield,
     color: Colors.accent,
   },
   {
@@ -50,7 +50,7 @@ export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { completeOnboarding } = useAuth();
+  const { completeInitialOnboarding } = useAuth();
 
   // Animation values
   const iconScale = useSharedValue(0);
@@ -80,8 +80,8 @@ export default function OnboardingScreen() {
   };
 
   const handleGetStarted = async () => {
-    await completeOnboarding();
-    router.replace('/welcome' as any);
+    await completeInitialOnboarding();
+    // The app will automatically navigate to welcome screen via the index.tsx logic
   };
 
   const currentSlide = slides[currentIndex];
@@ -134,11 +134,10 @@ export default function OnboardingScreen() {
         <Animated.View
           style={[
             styles.iconContainer,
-            { backgroundColor: currentSlide.color + '20' },
             iconAnimatedStyle
           ]}
         >
-          <Icon size={80} color={currentSlide.color} strokeWidth={1.5} />
+          <Icon size={80} color={Colors.white} strokeWidth={1.5} />
         </Animated.View>
 
         <Animated.Text
@@ -171,7 +170,7 @@ export default function OnboardingScreen() {
               style={[
                 styles.paginationDot,
                 currentIndex === index && styles.paginationDotActive,
-                { backgroundColor: currentIndex === index ? Colors.primary : Colors.borderLight },
+                { backgroundColor: currentIndex === index ? Colors.white : 'rgba(255, 255, 255, 0.3)' },
               ]}
             />
           ))}
@@ -182,7 +181,7 @@ export default function OnboardingScreen() {
           onPress={handleNext}
           onPressIn={handleButtonPressIn}
           onPressOut={handleButtonPressOut}
-          style={[styles.button, { backgroundColor: slides[currentIndex].color }, buttonAnimatedStyle]}
+          style={[styles.button, buttonAnimatedStyle]}
           activeOpacity={1}
         >
           <Text style={styles.buttonText}>
@@ -197,7 +196,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
+    backgroundColor: Colors.primary,
   },
   header: {
     paddingTop: 20,
@@ -207,10 +206,12 @@ const styles = StyleSheet.create({
   skipButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
   },
   skipText: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: Colors.white,
     fontWeight: '600' as const,
   },
   content: {
@@ -223,22 +224,26 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 48,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   title: {
     fontSize: 32,
     fontWeight: '700' as const,
-    color: Colors.primary,
+    color: Colors.white,
     textAlign: 'center',
     marginBottom: 16,
   },
   description: {
     fontSize: 18,
-    color: Colors.textSecondary,
+    color: Colors.white,
     textAlign: 'center',
     lineHeight: 26,
+    opacity: 0.9,
   },
   footer: {
     paddingHorizontal: 24,
@@ -264,17 +269,18 @@ const styles = StyleSheet.create({
   button: {
     height: 56,
     borderRadius: 28,
+    backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 6,
   },
   buttonText: {
     fontSize: 18,
     fontWeight: '600' as const,
-    color: Colors.white,
+    color: Colors.primary,
   },
 });

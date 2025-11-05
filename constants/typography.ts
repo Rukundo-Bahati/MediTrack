@@ -27,6 +27,14 @@ export const Typography = {
     letterSpacing: -0.2,
     color: Colors.text,
   } as TextStyle,
+
+  h4: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    lineHeight: 24,
+    letterSpacing: -0.1,
+    color: Colors.text,
+  } as TextStyle,
   
   // Body text - optimized for readability
   body: {

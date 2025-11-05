@@ -21,7 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function DistributorHome() {
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 

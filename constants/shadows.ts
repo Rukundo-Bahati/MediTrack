@@ -55,4 +55,22 @@ export const Shadows = {
     shadowRadius: 6,
     elevation: 3,
   } as ViewStyle,
+
+  // Card shadow - for elevated cards
+  card: {
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  } as ViewStyle,
+
+  // Success shadow - for success elements
+  success: {
+    shadowColor: Colors.success,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  } as ViewStyle,
 };

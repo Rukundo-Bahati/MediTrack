@@ -1,19 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import {
-  ArrowLeft,
-  Calendar,
-  Hash,
-  Layers,
-  Package
+    ArrowLeft,
+    Calendar,
+    Hash,
+    Layers,
+    Package
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
-  BounceIn,
-  FadeInDown,
-  FadeInUp,
-  SlideInRight
+    BounceIn,
+    FadeInDown,
+    FadeInUp,
+    SlideInRight
 } from 'react-native-reanimated';
 import { ModernButton } from '../../components/ui/modern-button';
 import { ModernCard } from '../../components/ui/modern-card';
@@ -36,7 +36,7 @@ interface Batch {
 
 export default function BatchesScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   const [batches, setBatches] = useState<Batch[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredBatches, setFilteredBatches] = useState<Batch[]>([]);
@@ -202,7 +202,7 @@ export default function BatchesScreen() {
             </Text>
           </View>
 
-          {user?.role === 'manufacturer' && (
+          {userProfile?.role === 'manufacturer' && (
             <Animated.View entering={BounceIn.delay(400)}>
               <ModernButton
                 title="Register New Batch"
@@ -260,7 +260,7 @@ export default function BatchesScreen() {
                 : 'Register your first batch to get started'
               }
             </Text>
-            {!searchQuery && user?.role === 'manufacturer' && (
+            {!searchQuery && userProfile?.role === 'manufacturer' && (
               <ModernButton
                 title="Register First Batch"
                 onPress={() => router.push('/register-batch')}

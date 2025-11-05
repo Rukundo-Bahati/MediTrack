@@ -16,8 +16,8 @@ import RegulatorDashboard from '../screens/regulator/RegulatorDashboard';
 const Tab = createBottomTabNavigator();
 
 export default function RoleTabs() {
-    const { user } = useAuth();
-    const role = user?.role;
+    const { userProfile } = useAuth();
+    const role = userProfile?.role;
 
     const tabScreenOptions = {
         headerShown: false,
@@ -118,37 +118,7 @@ export default function RoleTabs() {
         );
     }
 
-    // Admin tabs
-    if (role === 'admin') {
-        return (
-            <Tab.Navigator screenOptions={tabScreenOptions}>
-                <Tab.Screen
-                    name="HomeTab"
-                    component={RegulatorDashboard}
-                    options={{
-                        tabBarLabel: 'Dashboard',
-                        tabBarIcon: ({ color }) => <MaterialIcons name="dashboard" color={color} size={24} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Reports"
-                    component={ReportsScreen}
-                    options={{
-                        tabBarLabel: 'Reports',
-                        tabBarIcon: ({ color }) => <MaterialIcons name="report" color={color} size={24} />
-                    }}
-                />
-                <Tab.Screen
-                    name="Profile"
-                    component={ProfileScreen}
-                    options={{
-                        tabBarLabel: 'Profile',
-                        tabBarIcon: ({ color }) => <MaterialIcons name="person" color={color} size={24} />
-                    }}
-                />
-            </Tab.Navigator>
-        );
-    }
+    // Admin tabs removed - no admin role in Web3 system
 
     // Regulator tabs
     if (role === 'regulator') {

@@ -5,6 +5,7 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MediTrackLoader from './components/MediTrackLoader';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { WalletProvider } from './context/WalletContext';
 import { AppThemeProvider } from './lib/theme';
 
 function AppContent() {
@@ -21,10 +22,10 @@ function AppContent() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="welcome" />
-        <Stack.Screen name="login" />
         <Stack.Screen name="scan" />
         <Stack.Screen name="verify-result" />
         <Stack.Screen name="register-batch" />
+        <Stack.Screen name="web3-register-batch" />
         <Stack.Screen name="shipment-details" />
         <Stack.Screen name="append-transport" />
         <Stack.Screen name="incidents" />
@@ -39,9 +40,11 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AppThemeProvider>
         <PaperProvider>
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
+          <WalletProvider>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </WalletProvider>
         </PaperProvider>
       </AppThemeProvider>
     </SafeAreaProvider>

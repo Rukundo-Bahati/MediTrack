@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   const [recent, setRecent] = useState<any[]>([]);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function HistoryScreen() {
 
   // Mock history data based on user role
   const getHistoryData = () => {
-    switch (user?.role) {
+    switch (userProfile?.role) {
       case 'manufacturer':
         return [
           { id: '1', type: 'batch_registered', title: 'Paracetamol 500mg', subtitle: 'BATCH-2025-001 registered', time: '2 hours ago', status: 'success' },
@@ -89,14 +89,14 @@ export default function HistoryScreen() {
         <Text style={styles.title}>Activity History</Text>
       </View>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
         showsVerticalScrollIndicator={false}
       >
         {historyData.map((item, index) => {
           const IconComponent = getIcon(item.type);
           const statusColor = getStatusColor(item.status);
-          
+
           return (
             <TouchableOpacity key={item.id} style={styles.historyCard} activeOpacity={0.7}>
               <View style={styles.historyLine}>
@@ -107,7 +107,7 @@ export default function HistoryScreen() {
                   <View style={styles.historyConnector} />
                 )}
               </View>
-              
+
               <View style={styles.historyContent}>
                 <View style={styles.historyHeader}>
                   <Text style={styles.historyTitle}>{item.title}</Text>

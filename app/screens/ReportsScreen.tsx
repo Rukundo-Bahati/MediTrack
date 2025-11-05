@@ -4,7 +4,23 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModernNavbar } from '../../components/ui/modern-navbar';
 import { Colors } from '../../constants/colors';
-import { getAllReports } from '../services/blockchainService';
+// Mock reports data since blockchainService was removed
+const getAllReports = () => [
+  {
+    id: '1',
+    title: 'Counterfeit Batch Detected',
+    description: 'Suspicious batch FAKE001 reported by pharmacy',
+    severity: 'high',
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: '2', 
+    title: 'Supply Chain Anomaly',
+    description: 'Unusual shipping pattern detected',
+    severity: 'medium',
+    timestamp: new Date().toISOString(),
+  }
+];
 
 export default function ReportsScreen() {
   const router = useRouter();
@@ -29,7 +45,7 @@ export default function ReportsScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
         showsVerticalScrollIndicator={false}
       >
-        {reports.map((report) => (
+        {reports.map((report: any) => (
           <View key={report.id} style={styles.reportCard}>
             <View style={styles.reportHeader}>
               <View style={[styles.reportIcon, { backgroundColor: Colors.warning + '20' }]}>

@@ -1,13 +1,13 @@
 import { useRouter } from 'expo-router';
-import { AlertTriangle, Package, ScanLine, Shield } from 'lucide-react-native';
+import { AlertTriangle, Hash, Package, ScanLine, Shield } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
-  FadeInDown,
-  runOnJS,
-  SlideInRight,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring
+    FadeInDown,
+    runOnJS,
+    SlideInRight,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModernCard } from '../../../components/ui/modern-card';
@@ -24,7 +24,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
 
   // Animation values
   const scanCardScale = useSharedValue(1);
@@ -48,6 +48,10 @@ export default function HomeScreen() {
 
   const handleScan = () => {
     router.push('/scan' as any);
+  };
+
+  const handleBatchVerify = () => {
+    router.push('/verify' as any);
   };
 
   const handleReportIssue = () => {
@@ -77,25 +81,44 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <ModernNavbar title="Consumer Portal" />
       <ScreenLayout scrollable style={styles.scrollContainer}>
-      {/* Hero Scan Section */}
+      {/* Hero Verification Section */}
       <Animated.View 
         entering={FadeInDown.delay(200)}
         style={styles.heroSection}
       >
-        <TouchableOpacity
-          onPress={handleScan}
-          activeOpacity={0.7}
-        >
-          <ModernCard variant="primary" style={styles.scanCard}>
-            <View style={styles.scanIconContainer}>
-              <ScanLine size={48} color={Colors.white} strokeWidth={2} />
-            </View>
-            <View style={styles.scanContent}>
-              <Text style={styles.scanTitle}>Scan QR Code</Text>
-              <Text style={styles.scanDescription}>Verify medicine authenticity instantly</Text>
-            </View>
-          </ModernCard>
-        </TouchableOpacity>
+        <View style={styles.verificationOptions}>
+          <TouchableOpacity
+            onPress={handleBatchVerify}
+            activeOpacity={0.7}
+            style={styles.primaryOption}
+          >
+            <ModernCard variant="primary" style={styles.verifyCard}>
+              <View style={styles.verifyIconContainer}>
+                <Hash size={40} color={Colors.white} strokeWidth={2.5} />
+              </View>
+              <View style={styles.verifyContent}>
+                <Text style={styles.verifyTitle}>Enter Batch Code</Text>
+                <Text style={styles.verifyDescription}>Type batch number to verify</Text>
+              </View>
+            </ModernCard>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleScan}
+            activeOpacity={0.7}
+            style={styles.secondaryOption}
+          >
+            <ModernCard variant="elevated" style={styles.scanCard}>
+              <View style={styles.scanIconContainer}>
+                <ScanLine size={32} color={Colors.primary} strokeWidth={2} />
+              </View>
+              <View style={styles.scanContent}>
+                <Text style={styles.scanTitle}>Scan QR Code</Text>
+                <Text style={styles.scanDescription}>Point camera at QR code</Text>
+              </View>
+            </ModernCard>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
 
 
@@ -384,6 +407,45 @@ const styles = StyleSheet.create({
     ...Typography.bodySmall,
     fontWeight: '600',
     textAlign: 'center',
+  },
+
+  // Verification Options Styles
+  verificationOptions: {
+    gap: Spacing.md,
+    marginBottom: Spacing.xl,
+  },
+  primaryOption: {
+    marginBottom: Spacing.md,
+  },
+  secondaryOption: {
+    marginTop: Spacing.md,
+  },
+  verifyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+  },
+  verifyIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.lg,
+  },
+  verifyContent: {
+    flex: 1,
+  },
+  verifyTitle: {
+    ...Typography.h2,
+    color: Colors.white,
+    marginBottom: Spacing.xs,
+  },
+  verifyDescription: {
+    ...Typography.body,
+    color: 'rgba(255, 255, 255, 0.9)',
   },
 
   // Info Card Styles

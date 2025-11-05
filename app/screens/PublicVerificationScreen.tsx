@@ -1,30 +1,30 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import {
-    ArrowLeft,
-    Camera,
-    CheckCircle,
-    Info,
-    Search,
-    Shield,
-    WifiOff,
-    XCircle
+  ArrowLeft,
+  Camera,
+  CheckCircle,
+  Info,
+  Search,
+  Shield,
+  WifiOff,
+  XCircle
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import {
-    Alert,
-    Dimensions,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import Animated, {
-    BounceIn,
-    FadeIn,
-    FadeInDown,
-    SlideInUp
+  BounceIn,
+  FadeIn,
+  FadeInDown,
+  SlideInUp
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModernButton } from '../../components/ui/modern-button';
@@ -61,7 +61,7 @@ const getMedicineWarnings = (drugName: string): string[] => {
   } else if (drugName.toLowerCase().includes('ibuprofen')) {
     return [...commonWarnings, 'Take with food', 'Avoid alcohol consumption'];
   }
-  
+
   return commonWarnings;
 };
 
@@ -123,7 +123,7 @@ export default function PublicVerificationScreen() {
       // Use blockchain service for verification
       const { blockchainService } = await import('../services/blockchain');
       const result = await blockchainService.verifyBatch(code);
-      
+
       if (!result.isValid || !result.batchData) {
         // Handle invalid/counterfeit medicine
         const invalidMedicine: MedicineInfo = {
@@ -149,7 +149,7 @@ export default function PublicVerificationScreen() {
       // Convert blockchain data to MedicineInfo format
       const batchData = result.batchData;
       const currentTime = Math.floor(Date.now() / 1000);
-      
+
       let verificationStatus: 'verified' | 'counterfeit' | 'expired' | 'recalled' = 'verified';
       if (currentTime > batchData.expiryDate) {
         verificationStatus = 'expired';
@@ -211,7 +211,7 @@ export default function PublicVerificationScreen() {
         'Please enable camera access to scan QR codes for medicine verification.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Settings', onPress: () => {} }
+          { text: 'Settings', onPress: () => { } }
         ]
       );
     }
@@ -262,7 +262,7 @@ export default function PublicVerificationScreen() {
   if (medicineInfo) {
     const StatusIcon = getStatusIcon(medicineInfo.verificationStatus);
     const statusColor = getStatusColor(medicineInfo.verificationStatus);
-    
+
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -301,32 +301,32 @@ export default function PublicVerificationScreen() {
           <Animated.View entering={SlideInUp.delay(300)}>
             <ModernCard variant="elevated" style={styles.detailsCard}>
               <Text style={styles.sectionTitle}>Medicine Information</Text>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Manufacturer:</Text>
                 <Text style={styles.detailValue}>{medicineInfo.manufacturer}</Text>
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Batch Number:</Text>
                 <Text style={styles.detailValue}>{medicineInfo.batchNumber}</Text>
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Active Ingredient:</Text>
                 <Text style={styles.detailValue}>{medicineInfo.activeIngredient}</Text>
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Dosage:</Text>
                 <Text style={styles.detailValue}>{medicineInfo.dosage}</Text>
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Manufacturing Date:</Text>
                 <Text style={styles.detailValue}>{medicineInfo.manufacturingDate}</Text>
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Expiry Date:</Text>
                 <Text style={styles.detailValue}>{medicineInfo.expiryDate}</Text>
@@ -432,19 +432,42 @@ export default function PublicVerificationScreen() {
           <Text style={styles.headerTitle}>Verify Medicine</Text>
         </Animated.View>
 
-        {/* Welcome Section */}
-        <Animated.View entering={FadeInDown.delay(200)} style={styles.welcomeSection}>
-          <View style={styles.welcomeIcon}>
-            <Shield size={48} color={Colors.primary} />
-          </View>
-          <Text style={styles.welcomeTitle}>Medicine Authentication</Text>
-          <Text style={styles.welcomeSubtitle}>
-            Verify the authenticity of your medicines using our blockchain-powered verification system
-          </Text>
+        {/* Primary Action - Batch Code Entry */}
+        <Animated.View entering={SlideInUp.delay(200)}>
+          <ModernCard variant="filled" style={styles.primaryForm}>
+            <View style={styles.primaryHeader}>
+              <Shield size={32} color={Colors.primary} />
+              <Text style={styles.primaryTitle}>Verify Medicine</Text>
+            </View>
+            <Text style={styles.primaryDescription}>
+              Enter batch code to verify authenticity
+            </Text>
+            <ModernInput
+              placeholder="Enter batch code (e.g.,PARA001)"
+              value={manualCode}
+              onChangeText={setManualCode}
+              containerStyle={styles.primaryInput}
+            />
+            <ModernButton
+              title="Verify Medicine"
+              onPress={handleManualVerification}
+              variant="primary"
+              size="large"
+              disabled={!manualCode.trim()}
+              style={styles.primaryButton}
+            />
+          </ModernCard>
+        </Animated.View>
+
+        {/* Divider */}
+        <Animated.View entering={FadeInDown.delay(300)} style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>OR</Text>
+          <View style={styles.dividerLine} />
         </Animated.View>
 
         {/* Scan Option */}
-        <Animated.View entering={SlideInUp.delay(300)}>
+        <Animated.View entering={SlideInUp.delay(400)}>
           <ModernCard variant="elevated" style={styles.scanOptionCard}>
             <View style={styles.scanOptionHeader}>
               <View style={styles.scanOptionIcon}>
@@ -460,7 +483,7 @@ export default function PublicVerificationScreen() {
             <ModernButton
               title={permission?.granted ? "Start Scanning" : "Enable Camera"}
               onPress={permission?.granted ? () => setShowCamera(true) : requestCameraPermission}
-              variant="primary"
+              variant="secondary"
               size="large"
               style={styles.scanButton}
             />
@@ -468,7 +491,7 @@ export default function PublicVerificationScreen() {
         </Animated.View>
 
         {/* Manual Entry Option */}
-        <Animated.View entering={SlideInUp.delay(400)}>
+        <Animated.View entering={SlideInUp.delay(500)}>
           <ModernCard variant="elevated" style={styles.manualOptionCard}>
             <View style={styles.manualOptionHeader}>
               <View style={styles.manualOptionIcon}>
@@ -484,30 +507,6 @@ export default function PublicVerificationScreen() {
           </ModernCard>
         </Animated.View>
 
-        {/* Manual Entry Form */}
-        <Animated.View entering={SlideInUp.delay(500)}>
-          <ModernCard variant="filled" style={styles.manualForm}>
-            <Text style={styles.manualFormTitle}>Enter Batch Code</Text>
-            <Text style={styles.manualFormDescription}>
-              Type the batch code found on your medicine package
-            </Text>
-            <ModernInput
-              placeholder="Enter batch code (e.g., PARA001, AMOX002)"
-              value={manualCode}
-              onChangeText={setManualCode}
-              containerStyle={styles.manualInput}
-            />
-            <ModernButton
-              title="Verify Medicine"
-              onPress={handleManualVerification}
-              variant="primary"
-              size="large"
-              disabled={!manualCode.trim()}
-              style={styles.verifyButton}
-            />
-          </ModernCard>
-        </Animated.View>
-
         {/* Info Section */}
         <Animated.View entering={SlideInUp.delay(600)}>
           <ModernCard variant="filled" style={styles.infoCard}>
@@ -517,7 +516,7 @@ export default function PublicVerificationScreen() {
             <View style={styles.infoContent}>
               <Text style={styles.infoTitle}>How It Works</Text>
               <Text style={styles.infoText}>
-                Our system uses blockchain technology to verify medicine authenticity. 
+                Our system uses blockchain technology to verify medicine authenticity.
                 Each genuine medicine has a unique QR code that links to immutable blockchain records.
               </Text>
             </View>
@@ -531,12 +530,12 @@ export default function PublicVerificationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundSecondary,
   },
   scrollView: {
     flex: 1,
   },
-  
+
   // Header Styles
   header: {
     flexDirection: 'row',
@@ -548,7 +547,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.backgroundSecondary,
+    backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: Spacing.md,
@@ -716,31 +715,60 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Manual Form Styles
-  manualForm: {
+  // Primary Form Styles (Top Priority)
+  primaryForm: {
     marginHorizontal: Spacing.layout.container,
     paddingVertical: Spacing.xl,
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.lg,
+    marginTop: Spacing.md,
   },
-  manualFormTitle: {
-    ...Typography.h3,
-    color: Colors.text,
-    marginBottom: Spacing.sm,
-    textAlign: 'center',
+  primaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
   },
-  manualFormDescription: {
+  primaryTitle: {
+    ...Typography.h2,
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  primaryDescription: {
     ...Typography.body,
     color: Colors.textSecondary,
     textAlign: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
     lineHeight: 22,
   },
-  manualInput: {
-    marginBottom: Spacing.lg,
+  primaryInput: {
+    marginBottom: Spacing.xl,
   },
-  verifyButton: {
+  primaryButton: {
     width: '100%',
+    height: 56,
+    borderRadius: 28,
+  },
+
+  // Divider Styles
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: Spacing.layout.container,
+    marginVertical: Spacing.xl,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+  dividerText: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginHorizontal: Spacing.lg,
+    backgroundColor: Colors.backgroundSecondary,
+    paddingHorizontal: Spacing.sm,
   },
 
   // Info Card Styles

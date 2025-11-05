@@ -27,9 +27,9 @@ export const Colors = {
   error: '#EF4444',
 
   // Additional colors for UI variety while maintaining orange theme
-  indigo: '#6366F1',   
-  teal: '#14B8A6',    
-  orange: '#FF9800',    
+  indigo: '#6366F1',
+  teal: '#14B8A6',
+  orange: '#FF9800',
 };
 
 export const RoleColors = {

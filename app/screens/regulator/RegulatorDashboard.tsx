@@ -15,12 +15,12 @@ import { useAuth } from '../../context/AuthContext';
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function RegulatorDashboard() {
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   // Check if user is admin to show admin-specific content
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = userProfile?.role === 'regulator';
 
   const primaryActions = isAdmin ? [
     {

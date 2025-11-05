@@ -1,10 +1,10 @@
 import { ModernNavbar } from '@/components/ui';
 import { useRouter } from 'expo-router';
 import {
-  AlertTriangle,
-  History as HistoryIcon,
-  Package,
-  ScanLine
+    AlertTriangle,
+    History as HistoryIcon,
+    Package,
+    ScanLine
 } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
@@ -20,7 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function PharmacistHome() {
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
