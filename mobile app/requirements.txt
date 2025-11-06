@@ -1,0 +1,3 @@
+# Python dependencies for QR code generation
+qrcode[pil]==7.4.2
+Pillow>=9.0.0

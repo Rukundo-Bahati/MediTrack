@@ -1,0 +1,25 @@
+{
+  "name": "meditrack-blockchain-setup",
+  "version": "1.0.0",
+  "description": "Blockchain setup for MediTrack - Smart contracts deployment",
+  "scripts": {
+    "install-deps": "npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox @openzeppelin/contracts dotenv",
+    "compile": "npx hardhat compile",
+    "deploy:local": "npx hardhat run contracts/deploy.js --network hardhat",
+    "deploy:sepolia": "npx hardhat run contracts/deploy.js --network sepolia",
+    "deploy:mumbai": "npx hardhat run contracts/deploy.js --network mumbai",
+    "deploy:bsc": "npx hardhat run contracts/deploy.js --network bscTestnet",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "setup": "npm run install-deps && npm run compile"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.2",
+    "@openzeppelin/contracts": "^4.9.3",
+    "hardhat": "^2.17.1",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": ["blockchain", "ethereum", "smart-contracts", "pharmaceutical", "supply-chain"],
+  "author": "MediTrack Team",
+  "license": "MIT"
+}

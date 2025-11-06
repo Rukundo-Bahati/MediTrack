@@ -1,0 +1,52 @@
+{
+  "generated_at": "2025-11-03T17:07:42.149015",
+  "description": "QR codes for MediTrack app testing",
+  "usage": "Scan these QR codes with the MediTrack app to test verification functionality",
+  "batches": [
+    {
+      "batchId": "BATCH-2025-001",
+      "drugName": "Amoxicillin 500mg",
+      "lot": "LOT-12345",
+      "manufacturer": "GoodPharma Ltd",
+      "expiry": "2026-12-31",
+      "authentic": true,
+      "description": "Authentic Amoxicillin batch"
+    },
+    {
+      "batchId": "BATCH-2025-002",
+      "drugName": "Paracetamol 500mg",
+      "lot": "LOT-67890",
+      "manufacturer": "PharmaCorp Ltd",
+      "expiry": "2026-06-30",
+      "authentic": true,
+      "description": "Authentic Paracetamol batch"
+    },
+    {
+      "batchId": "BATCH-FAKE-001",
+      "drugName": "Ibuprofen 200mg",
+      "lot": "LOT-FAKE-123",
+      "manufacturer": "SuspiciousPharma Inc",
+      "expiry": "2025-03-15",
+      "authentic": false,
+      "description": "Counterfeit Ibuprofen batch (for testing)"
+    },
+    {
+      "batchId": "BATCH-2025-003",
+      "drugName": "Aspirin 100mg",
+      "lot": "LOT-ASP-456",
+      "manufacturer": "HealthPharma",
+      "expiry": "2026-09-20",
+      "authentic": true,
+      "description": "Authentic Aspirin batch"
+    },
+    {
+      "batchId": "BATCH-FAKE-002",
+      "drugName": "Amoxicillin 500mg",
+      "lot": "LOT-FAKE-789",
+      "manufacturer": "CounterfeitCorp",
+      "expiry": "2024-12-31",
+      "authentic": false,
+      "description": "Counterfeit Amoxicillin batch (for testing)"
+    }
+  ]
+}
