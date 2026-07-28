@@ -236,7 +236,7 @@ export default function RecordTransitScreen() {
             if (router.canGoBack()) {
               router.back();
             } else {
-              router.replace('/(tabs)');
+              router.replace('/');
             }
           }}
           activeOpacity={0.7}

@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import RoleTabs from '../navigation/RoleTabs';
-import OnboardingScreen from '../screens/OnboardingScreen';
-import WelcomeScreen from '../screens/WelcomeScreen';
+import { useAuth } from './context/AuthContext';
+import RoleTabs from './navigation/RoleTabs';
+import OnboardingScreen from './screens/OnboardingScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 export default function HomeScreen() {
   const { userProfile, loading, isAuthenticated, hasSeenOnboarding } = useAuth();

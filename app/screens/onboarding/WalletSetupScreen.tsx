@@ -70,7 +70,7 @@ export default function WalletSetupScreen() {
 
   const handleComplete = () => {
     // Save role and navigate to main app
-    router.replace(`/(tabs)?role=${role}` as any);
+    router.replace(`/?role=${role}` as any);
   };
 
   const handleInstallMetaMask = () => {

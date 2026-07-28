@@ -95,7 +95,7 @@ export default function AlertsScreen() {
                     if (router.canGoBack()) {
                         router.back();
                     } else {
-                        router.replace('/(tabs)');
+                        router.replace('/');
                     }
                 }}
             />

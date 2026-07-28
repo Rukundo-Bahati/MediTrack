@@ -68,14 +68,14 @@ export default function EnhancedNotFoundScreen() {
   }, [bounceAnim, fadeAnim, slideAnim]);
 
   const handleGoHome = () => {
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   const handleGoBack = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(tabs)');
+      router.replace('/');
     }
   };
 

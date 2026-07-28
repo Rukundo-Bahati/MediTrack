@@ -239,7 +239,7 @@ export default function RegisterBatch() {
             if (router.canGoBack()) {
               router.back();
             } else {
-              router.replace('/(tabs)');
+              router.replace('/');
             }
           }}
           activeOpacity={0.7}

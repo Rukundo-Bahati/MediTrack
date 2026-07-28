@@ -115,7 +115,7 @@ export default function BatchAuditScreen() {
           if (router.canGoBack()) {
             router.back();
           } else {
-            router.replace('/(tabs)');
+            router.replace('/');
           }
         }}
       />

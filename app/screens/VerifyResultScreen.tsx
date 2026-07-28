@@ -247,7 +247,7 @@ export default function VerificationScreen() {
       <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
         <TouchableOpacity 
           style={styles.primaryButton}
-          onPress={() => router.push('/(tabs)' as any)}
+          onPress={() => router.push('/' as any)}
         >
           <Text style={styles.primaryButtonText}>Done</Text>
         </TouchableOpacity>

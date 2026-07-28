@@ -37,14 +37,14 @@ export default function NotFoundScreen() {
   }, [bounceAnim, fadeAnim]);
 
   const handleGoHome = () => {
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   const handleGoBack = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(tabs)');
+      router.replace('/');
     }
   };
 

@@ -36,7 +36,7 @@ export default function ReportsScreen() {
           if (router.canGoBack()) {
             router.back();
           } else {
-            router.replace('/(tabs)');
+            router.replace('/');
           }
         }}
       />

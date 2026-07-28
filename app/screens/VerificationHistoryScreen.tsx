@@ -227,7 +227,7 @@ export default function VerificationHistoryScreen() {
           if (router.canGoBack()) {
             router.back();
           } else {
-            router.replace('/(tabs)');
+            router.replace('/');
           }
         }}
       />

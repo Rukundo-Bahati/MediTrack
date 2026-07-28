@@ -18,18 +18,8 @@ function AppContent() {
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="welcome" />
-        <Stack.Screen name="scan" />
-        <Stack.Screen name="verify-result" />
-        <Stack.Screen name="register-batch" />
-        <Stack.Screen name="web3-register-batch" />
-        <Stack.Screen name="shipment-details" />
-        <Stack.Screen name="append-transport" />
-        <Stack.Screen name="incidents" />
-        <Stack.Screen name="batch-audit" />
+      <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
+        <Stack.Screen name="index" />
       </Stack>
     </>
   );
@@ -50,3 +40,7 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+export const unstable_settings = {
+  initialRouteName: 'index',
+};
